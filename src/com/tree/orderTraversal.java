@@ -3,6 +3,8 @@ package com.tree;/**
  * @date 2024/1/3 14:30
  * @version 1.0
  */
+import sun.reflect.generics.tree.Tree;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -230,5 +232,125 @@ public class orderTraversal {
         return ret;
 
     }
+
+    /**
+     * 在树的每层中寻找最大值
+     * @param root
+     * @return
+     */
+    public List<Integer> largestValues(TreeNode root) {
+        List<Integer> ret = new ArrayList<>();
+        if(root == null) return ret;
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            int len = que.size();
+            int max = que.peek().val;
+            while(len!=0){
+                TreeNode temp = que.poll();
+                max = max < temp.val ? temp.val:max;
+                if(temp.left!=null) que.offer(temp.left);
+                if(temp.right!=null) que.offer(temp.right);
+                len -= 1;
+            }
+            ret.add(max);
+        }
+
+        return ret;
+    }
+
+    class Node116 {
+        public int val;
+        public Node116 left;
+        public Node116 right;
+        public Node116 next;
+
+        public Node116() {}
+
+        public Node116(int _val) {
+            val = _val;
+        }
+
+        public Node116(int _val, Node116 _left, Node116 _right, Node116 _next) {
+            val = _val;
+            left = _left;
+            right = _right;
+            next = _next;
+        }
+    };
+
+    /**
+     * 116、117
+     * @param root
+     * @return
+     */
+    public Node116 connect(Node116 root) {
+        if (root == null) return root;
+        Queue<Node116> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            while (len != 0){
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                Node116 temp = que.poll();
+                if (len > 1) {
+                    temp.next = que.peek();
+                }
+                len--;
+            }
+        }
+        return root;
+    }
+
+
+    /**
+     * 104:深度
+     * @param root
+     * @return
+     */
+    public int maxDepth(TreeNode root) {
+        int deep = 0;
+        if (root == null) return deep;
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            deep++;
+            while (len != 0){
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+        }
+        return deep;
+    }
+
+
+    /**
+     * 111:最小深度
+     * @param root
+     * @return
+     */
+    public int minDepth(TreeNode root) {
+        int deep = 0;
+        if (root == null) return deep;
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            deep++;
+            while (len != 0){
+                if(que.peek().left == null && que.peek().right==null) return deep;
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+        }
+        return deep;
+    }
+
 
 }
