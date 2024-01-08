@@ -1,9 +1,4 @@
-package com.tree;/**
- * @author zhf
- * @date 2024/1/3 14:30
- * @version 1.0
- */
-import sun.reflect.generics.tree.Tree;
+package com.tree;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +9,7 @@ import java.util.stream.Collectors;
  * 描述：二叉树的遍历
  * @date 2024/1/3 14:30
  **/
+@SuppressWarnings("all")
 public class orderTraversal {
 
     /**
@@ -350,6 +346,111 @@ public class orderTraversal {
             }
         }
         return deep;
+    }
+
+
+    /**
+     * 226：翻转二叉树
+     * @param root
+     * @return
+     */
+    public TreeNode invertTree(TreeNode root) {
+        if(root == null) return root;
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            int len = que.size();
+            while(len != 0){
+                TreeNode temp = que.peek().left;
+                que.peek().left = que.peek().right;
+                que.peek().right = temp;
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+        }
+        return root;
+    }
+
+
+    /**
+     * 101:对称二叉树
+     * 左孩子等于另一棵树的右孩子
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric(TreeNode root) {
+        return check(root,root);
+    }
+
+    private boolean check(TreeNode left, TreeNode right) {
+        if(left == null && right == null) return true;
+        if(left == null || right == null) return false;
+        if(left.val != right.val) return false;
+        return check(left.left,right.right) && check(left.right,right.left);
+    }
+
+
+    /**
+     * 222：完全二叉树结点个数
+     * @param root
+     * @return
+     */
+    public int countNodes(TreeNode root) {
+        int ret = 0;
+        if (root == null) return ret;
+        ret++;
+        ret = ret + countNodes(root.left);
+        ret = ret + countNodes(root.right);
+        return ret;
+    }
+
+
+    /**
+     * 110:平衡二叉树
+     * 重点：平衡二叉树的性质：一个二叉树的每个结点的左右两个子树的高度差绝对值不超过1
+     * @param root
+     * @return
+     */
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+        return heightDifference(root.left,root.right);
+    }
+
+    private boolean heightDifference(TreeNode left, TreeNode right) {
+        int deepL = maxDepth(left);
+        int deepR = maxDepth(right);
+        if(Math.abs(deepL-deepR) < 2 && left == null && right == null) return true;
+        if(Math.abs(deepL-deepR) < 2 && left == null) return true  && heightDifference(right.left,right.right);
+        if(Math.abs(deepL-deepR) < 2 && right == null) return true && heightDifference(left.left,left.right);
+        if(Math.abs(deepL-deepR) < 2) return true && heightDifference(left.left,left.right) && heightDifference(right.left,right.right);
+        return false;
+    }
+
+
+    /**
+     * 257:二叉树的所有路径
+     * @param root
+     * @return
+     */
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ret = new ArrayList<>();
+        if(root == null) return ret;
+        paths(root,String.valueOf(root.val),ret);
+        return ret;
+    }
+
+    private void paths(TreeNode root, String path, List<String> paths) {
+        if(root.left == null && root.right == null){
+            paths.add(path);
+        }
+        if(root.left!=null){
+            paths(root.left,path+"->"+root.left.val,paths);
+        }
+        if(root.right!=null){
+            paths(root.right,path+"->"+root.right.val,paths);
+        }
     }
 
 
