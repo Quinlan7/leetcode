@@ -1,5 +1,7 @@
 package com.tree;
 
+import sun.reflect.generics.tree.Tree;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -450,6 +452,174 @@ public class orderTraversal {
         }
         if(root.right!=null){
             paths(root.right,path+"->"+root.right.val,paths);
+        }
+    }
+
+
+    /**
+     * 100:相同的树
+     * @param p
+     * @param q
+     * @return
+     */
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if(p == null && q != null) return false;
+        if(q == null && p != null) return false;
+        if(q == null && p == null) return true;
+        if(p.val != q.val) return false;
+        return p.val == q.val && isSameTree(p.left,q.left) && isSameTree(p.right,q.right);
+    }
+
+
+    /**
+     * 404:左叶子之和
+     * @param root
+     * @return
+     */
+    public int sumOfLeftLeaves(TreeNode root) {
+        if(root == null) return 0;
+        if(root.left == null) return sumOfLeftLeaves(root.right);
+        if(root.left.left == null && root.left.right == null) {
+            return root.left.val+sumOfLeftLeaves(root.right);
+        }else return sumOfLeftLeaves(root.left)+sumOfLeftLeaves(root.right);
+    }
+
+
+    /**
+     * 513:找树左下角的值
+     * @param root
+     * @return
+     */
+    public int findBottomLeftValue(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            List<Integer> temp = new ArrayList<>();
+            while (len != 0){
+                temp.add(que.peek().val);
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+            ret.add(temp);
+        }
+        List<Integer> temp = ret.get(ret.size()-1);
+        return temp.get(0);
+    }
+
+
+    /**
+     * 112:路经总和
+     * @param root
+     * @param targetSum
+     * @return
+     */
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if(root == null) return false;
+        List<Integer> sums = new ArrayList<>();
+        Integer sum = 0;
+        pathsum(root,sums,sum);
+        for (int temp:
+             sums) {
+            if (temp == targetSum) return true;
+        }
+        return false;
+    }
+
+    private void pathsum(TreeNode root, List<Integer> sums, Integer sum) {
+        if(root == null) return;
+        if(root.left == null && root.right == null){
+            sum += root.val;
+            sums.add(sum);
+            return;
+        }
+        sum += root.val;
+        pathsum(root.left,sums,sum);
+        pathsum(root.right,sums,sum);
+    }
+
+
+    /**
+     * 106:根据中序和后序构造二叉树
+     * @param inorder
+     * @param postorder
+     * @return
+     */
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        TreeNode treeNode = new TreeNode();
+        if(inorder.length == 0 || postorder.length == 0) return treeNode;
+        buildTree(treeNode,inorder,postorder);
+        return treeNode;
+    }
+
+    private void buildTree(TreeNode treeNode, int[] inorder, int[] postorder) {
+        if(inorder.length == 0 || postorder.length == 0) return;
+        treeNode.val = postorder[postorder.length - 1];
+        int index = 0;
+        for (int i = 0; i < inorder.length; i++) {
+            if(inorder[i] == treeNode.val){
+                index = i;
+                break;
+            }
+        }
+        // 使用Arrays.copyOfRange分割数组
+        int[] leftInorder = Arrays.copyOfRange(inorder, 0, index);
+        int[] rightInorder = Arrays.copyOfRange(inorder, index + 1, inorder.length);
+
+        int[] leftPostorder = Arrays.copyOfRange(postorder, 0, index);
+        int[] rightPostorder = Arrays.copyOfRange(postorder, index, inorder.length - 1);
+
+        if(leftInorder.length !=0 ){
+            TreeNode nodeLeft = new TreeNode();
+            treeNode.left = nodeLeft;
+            buildTree(treeNode.left,leftInorder,leftPostorder);
+        }
+        if(rightInorder.length !=0 ){
+            TreeNode nodeRight = new TreeNode();
+            treeNode.right = nodeRight;
+            buildTree(treeNode.right,rightInorder,rightPostorder);
+        }
+    }
+
+
+    /**
+     * 654:最大二叉树
+     * @param nums
+     * @return
+     */
+    public TreeNode constructMaximumBinaryTree(int[] nums) {
+        TreeNode treeNode = new TreeNode();
+        if(nums.length == 0 ) return treeNode;
+        constructMaximumBinaryTree(treeNode,nums);
+        return treeNode;
+    }
+
+    private void constructMaximumBinaryTree(TreeNode treeNode, int[] nums) {
+        int max = 0,index = 0;
+        for (int i = 0; i < nums.length; i++) {
+            max = nums[i]>max? nums[i] : max;
+        }
+        treeNode.val = max;
+        for (int i = 0; i < nums.length; i++) {
+            if(nums[i] == treeNode.val){
+                index = i;
+                break;
+            }
+        }
+        int[] left = Arrays.copyOfRange(nums, 0, index);
+        int[] right = Arrays.copyOfRange(nums, index + 1, nums.length);
+        if(left.length !=0 ){
+            TreeNode nodeLeft = new TreeNode();
+            treeNode.left = nodeLeft;
+            constructMaximumBinaryTree(treeNode.left,left);
+        }
+        if(right.length !=0 ){
+            TreeNode nodeRight = new TreeNode();
+            treeNode.right = nodeRight;
+            constructMaximumBinaryTree(treeNode.right,right);
         }
     }
 
