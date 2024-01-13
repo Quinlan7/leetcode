@@ -1,5 +1,7 @@
 package com.tree;
 
+import com.stacksandqueues.EvalRPN;
+import org.junit.Test;
 import sun.reflect.generics.tree.Tree;
 
 import java.util.*;
@@ -622,6 +624,215 @@ public class orderTraversal {
             constructMaximumBinaryTree(treeNode.right,right);
         }
     }
+
+
+    /**
+     * 617:合并二叉树
+     * @param root1
+     * @param root2
+     * @return
+     */
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if(root1 == null && root2 == null) return null;
+        TreeNode treeNode = new TreeNode();
+        treeNode.val = (root1 != null? root1.val:0)+(root2 != null? root2.val : 0);
+        treeNode.left=mergeTrees(root1!=null?root1.left:null,root2!=null?root2.left:null);
+        treeNode.right=mergeTrees(root1!=null?root1.right:null,root2!=null?root2.right:null);
+        return treeNode;
+    }
+
+
+    /**
+     * 700:二叉搜索树中的搜索
+     * @param root
+     * @param val
+     * @return
+     */
+    public TreeNode searchBST(TreeNode root, int val) {
+        if(root == null) return null;
+        if(root.val == val) return root;
+        if(val > root.val) return searchBST(root.right,val);
+        if(val < root.val) return searchBST(root.left,val);
+        return null;
+    }
+
+
+    /**
+     * 98:验证二叉搜索树
+     * @param root
+     * @return
+     */
+    @Test
+    public void test1(){
+        TreeNode treeNode = new TreeNode(3);
+        TreeNode treeNode1 = new TreeNode(1);
+        TreeNode treeNode2 = new TreeNode(0);
+        TreeNode treeNode3 = new TreeNode(2);
+        TreeNode treeNode4 = new TreeNode(5);
+        TreeNode treeNode5 = new TreeNode(4);
+        TreeNode treeNode6 = new TreeNode(6);
+        treeNode.left = treeNode1;
+        treeNode.right = treeNode4;
+        treeNode1.left = treeNode2;
+        treeNode1.right = treeNode3;
+        treeNode4.left = treeNode5;
+        treeNode4.right = treeNode6;
+
+        boolean ret = isValidBST(treeNode);
+        System.out.println(ret);
+    }
+
+    public boolean isValidBST(TreeNode root) {
+        if(root == null) return true;
+        int temp = root.val;
+        if (ValidBSTleft(root.left,temp) && ValidBSTright(root.right,temp)) {
+            return isValidBST(root.left) && isValidBST(root.right);
+        }
+        return false;
+    }
+
+    private boolean ValidBSTright(TreeNode right, int temp) {
+        if(right == null) return true;
+        if(right.val > temp) return true&&ValidBSTright(right.left,temp)&&ValidBSTright(right.right,temp);
+        return false;
+    }
+
+    private boolean ValidBSTleft(TreeNode left, int temp) {
+        if(left == null) return true;
+        if(left.val < temp) return true&&ValidBSTleft(left.left,temp)&&ValidBSTleft(left.right,temp);
+        return false;
+    }
+
+    /**
+     * 530:二叉搜索树的最小绝对差
+     * @param root
+     * @return
+     */
+    @Test
+    public void test2(){
+        TreeNode treeNode = new TreeNode(4);
+        TreeNode treeNode1 = new TreeNode(1);
+        TreeNode treeNode2 = new TreeNode(2);
+        TreeNode treeNode3 = new TreeNode(3);
+        TreeNode treeNode4 = new TreeNode(4);
+        TreeNode treeNode5 = new TreeNode(5);
+        TreeNode treeNode6 = new TreeNode(6);
+        treeNode.left = treeNode2;
+        treeNode.right = treeNode6;
+        treeNode2.left = treeNode1;
+        treeNode2.right = treeNode3;
+
+
+        int ret = getMinimumDifference(treeNode);
+        System.out.println(ret);
+    }
+    public int getMinimumDifference(TreeNode root) {
+        int leftMin = 10001;
+        int rightMin = 10001;
+        if (root.left != null) {
+            TreeNode max = root.left;
+            while(max.right != null){
+                max = max.right;
+            }
+            leftMin = Math.min(Math.abs(max.val-root.val),getMinimumDifference(root.left));
+        }
+        if (root.right != null) {
+            TreeNode max = root.right;
+            while(max.left != null){
+                max = max.left;
+            }
+            rightMin = Math.min(Math.abs(max.val-root.val),getMinimumDifference(root.right));
+        }
+        return Math.min(leftMin,rightMin);
+    }
+
+
+    /**
+     * 501:二叉搜索树中的众数
+     * @param root
+     * @return
+     */
+    public int[] findMode(TreeNode root) {
+        if (root == null) return null;
+
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        List<Integer> temp = new ArrayList<>();
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            while (len != 0){
+                temp.add(que.peek().val);
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+        }
+        Map<Integer,Integer> frequencyMap = new HashMap<>();
+        for (Integer val:
+             temp) {
+            frequencyMap.put(val,frequencyMap.getOrDefault(val,0)+1);
+        }
+        // 找到出现次数最多的数字
+        int maxFrequency = 0;
+        for (int frequency : frequencyMap.values()) {
+            maxFrequency = Math.max(maxFrequency, frequency);
+        }
+        List<Integer> retList = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> map:
+             frequencyMap.entrySet()) {
+            if(map.getValue() == maxFrequency) retList.add(map.getKey());
+        }
+        int[] ret = retList.stream().mapToInt(Integer::intValue).toArray();
+        return ret;
+    }
+
+
+    /**
+     * 236:二叉树的最近公共祖先
+     * @param root
+     * @param p
+     * @param q
+     * @return
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) return null;
+        Queue<TreeNode> que = new LinkedList<>();
+        que.offer(root);
+        List<Integer> temp = new ArrayList<>();
+        while(!que.isEmpty()){
+            Integer len = que.size();
+            while (len != 0){
+                temp.add(que.peek().val);
+                if(que.peek().left!=null) que.offer(que.peek().left);
+                if(que.peek().right!=null) que.offer(que.peek().right);
+                que.poll();
+                len--;
+            }
+        }
+        if(temp.contains(p.val)&&temp.contains(q.val)){
+            TreeNode left = lowestCommonAncestor(root.left,p,q);
+            TreeNode right = lowestCommonAncestor(root.right,p,q);
+            if(left == null && right == null){
+                return root;
+            }
+            return left==null? right : left;
+
+        }
+        return null;
+
+    }
+
+    //太强了
+    public TreeNode lowestCommonAncestor_1(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null || root == p || root == q) return root;
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if(left == null) return right;
+        if(right == null) return left;
+        return root;
+    }
+
 
 
 }
