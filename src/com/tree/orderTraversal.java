@@ -1,8 +1,6 @@
 package com.tree;
 
-import com.stacksandqueues.EvalRPN;
 import org.junit.Test;
-import sun.reflect.generics.tree.Tree;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -833,6 +831,131 @@ public class orderTraversal {
         return root;
     }
 
+
+    /**
+     * 235：二叉搜索树的公共最近祖先
+     * @param root
+     * @param p
+     * @param q
+     * @return
+     */
+    public TreeNode lowestCommonAncestorBST(TreeNode root, TreeNode p, TreeNode q) {
+        if((root.val > p.val && root.val < q.val) || (root.val < p.val && root.val > q.val)) return root;
+        if(root == p || root == q) return root;
+        TreeNode left = null;
+        TreeNode right = null;
+        if(p.val > root.val && q.val > root.val) right = lowestCommonAncestorBST(root.right,p,q);
+        if(p.val < root.val && q.val < root.val) left = lowestCommonAncestorBST(root.left,p,q);
+        if(left == null) return right;
+        if(right == null) return left;
+        return null;
+    }
+
+
+    /**
+     * 701:二叉搜索树的插入
+     * @param root
+     * @param val
+     * @return
+     */
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if(root == null) return new TreeNode(val);
+        if(val > root.val){
+            root.right = insertIntoBST(root.right,val);
+
+        } else {
+            root.left = insertIntoBST(root.left,val);
+        }
+        return root;
+    }
+
+
+    /**
+     * 450 :删除二叉搜索树的结点
+     * @param root
+     * @param key
+     * @return
+     */
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if(root == null) return root;
+        if(key > root.val) root.right = deleteNode(root.right,key);
+        if(key < root.val) root.left = deleteNode(root.left,key);
+        if (root.val == key) {
+            if(root.left == root.right) return null;
+            if(root.left == null || root.right == null) return root.left == null? root.right:root.left;
+            if (root.left != null && root.right != null) {
+                TreeNode treeNode = root.left;
+                while(treeNode.right != null){
+                    treeNode = treeNode.right;
+                }
+                treeNode.right = root.right;
+                return root.left;
+            }
+        }
+        return root;
+    }
+
+
+    /**
+     * 669：修剪二叉搜索树
+     * @param root
+     * @param low
+     * @param high
+     * @return
+     */
+    public TreeNode trimBST(TreeNode root, int low, int high) {
+        if (root == null) return null;
+        root.left = trimBST(root.left,low,high);
+        root.right = trimBST(root.right,low,high);
+        if (!(root.val >= low && root.val <= high)) {
+            if(root.left == root.right) return null;
+            if(root.left == null || root.right == null) return root.left == null? root.right:root.left;
+            if (root.left != null && root.right != null) {
+                TreeNode treeNode = root.left;
+                while(treeNode.right != null){
+                    treeNode = treeNode.right;
+                }
+                treeNode.right = root.right;
+                return root.left;
+            }
+        }
+        return root;
+    }
+
+
+    /**
+     * 108:将有序数组转化为二叉搜索树
+     * @param nums
+     * @return
+     */
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if(nums.length == 0) return null;
+        if(nums.length == 1) return new TreeNode(nums[0]);
+        if(nums.length == 2) return new TreeNode(nums[1],new TreeNode(nums[0]),null);
+        int k = nums.length/2;
+        int[] left = Arrays.copyOfRange(nums,0,k);
+        int[] right = Arrays.copyOfRange(nums,k+1,nums.length);
+        TreeNode root = new TreeNode(nums[k]);
+        root.left = sortedArrayToBST(left);
+        root.right = sortedArrayToBST(right);
+        return root;
+    }
+
+
+    /**
+     * 538:把二叉搜索树转换为累加树
+     * @param root
+     * @return
+     */
+    int sum=0;
+    public TreeNode convertBST(TreeNode root) {
+        if(root == null) return null;
+        convertBST(root.right);
+        sum += root.val;
+        root.val = sum;
+        convertBST(root.left);
+        return root;
+    }
 
 
 }
