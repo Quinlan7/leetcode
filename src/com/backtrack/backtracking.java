@@ -5,7 +5,9 @@ package com.backtrack;/**
  */
 
 import org.junit.Test;
+import org.w3c.dom.css.CSSStyleRule;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -489,11 +491,10 @@ public class backtracking {
         backtrack_332(used, temp, tickets );
         return ret_332;
     }
-
     private void backtrack_332(boolean[] used, List<String> temp, List<List<String>> tickets) {
         if(temp.size() == tickets.size()+1){
             if(!ret_332.isEmpty()){
-                if(isSmall(temp)){
+                if(isSame(temp)){
                     ret_332.clear();
                     ret_332.addAll(new ArrayList<>(temp));
                 }
@@ -524,7 +525,7 @@ public class backtracking {
         }
     }
 
-    private boolean isSmall(List<String> temp) {
+    private boolean isSame(List<String> temp) {
         for (int i = 1; i < temp.size(); i++) {
             char[] charArray = temp.get(i).toCharArray();
             char[] ret = ret_332.get(i).toCharArray();
@@ -534,6 +535,127 @@ public class backtracking {
             }
         }
         return false;
+    }
+
+
+    /**
+     * 51:N皇后
+     * @param n
+     * @return
+     */
+    @Test
+    public void test_51(){
+        solveNQueens(4);
+    }
+    List<List<String>> ret_51 = new ArrayList<>();
+    public List<List<String>> solveNQueens(int n) {
+        int[][] board = new int[n][n];
+        backtrack_51(n, board );
+        return ret_51;
+    }
+
+    private void backtrack_51(int n, int[][] board) {
+        if(n == 0){
+            List<String> slove = new ArrayList<>();
+            for (int i = 0; i < board.length; i++) {
+                String row = new String();
+                for (int j = 0; j < board.length; j++) {
+                    if(board[i][j] == 1) row += "Q";
+                    else row += ".";
+                }
+                slove.add(new String(row));
+            }
+            ret_51.add(new ArrayList<>(slove));
+            return;
+        }
+        for (int i = 0; i < board.length; i++) {
+            if(isLegitimacy(board, n-1, i)){
+                board[n-1][i] = 1;
+                backtrack_51(n-1,board);
+                board[n-1][i] = 0;
+            }
+        }
+    }
+
+    /**
+     * @param board
+     * @param i 行
+     * @param j 列
+     * @return
+     */
+    private boolean isLegitimacy(int[][] board, int i, int j) {
+        for (int k = i+1; k < board.length ; k++) {
+            if(board[k][j] == 1) return false;
+            if(j+k-i < board.length && board[k][j+k-i] == 1) return false;
+            if(j-k+i >= 0 && board[k][j-k+i] == 1) return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * 37:解数独
+     * @param board
+     */
+
+
+    public void solveSudoku(char[][] board) {
+        solveSudoku2(board);
+    }
+    public boolean solveSudoku2(char[][] board) {
+        SuDuDie sudujie = isComplete(board);
+        if(sudujie.isCopmlete) return true;
+        int i = sudujie.row,j = sudujie.col;
+        for (int k = 1; k < 10; k++) {
+            if(isLegitimacy_37(board,i,j,k)){
+                board[i][j] = (char)(k + '0');
+                if(solveSudoku2(board)) return true;
+                board[i][j] = '.';
+            }
+        }
+        return false;
+    }
+
+
+    class SuDuDie{
+        boolean isCopmlete;
+        int row;
+        int col;
+
+        public SuDuDie(boolean isCopmlete) {
+            this.isCopmlete = isCopmlete;
+        }
+
+        public SuDuDie(boolean isCopmlete, int row, int col) {
+            this.isCopmlete = isCopmlete;
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+    private SuDuDie isComplete(char[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                if(board[i][j] == '.') return new SuDuDie(false,i,j);
+            }
+        }
+        return new SuDuDie(true);
+    }
+
+
+    private boolean isLegitimacy_37(char[][] board, int i, int j , int num) {
+        for (int k = 0; k < board.length ; k++) {
+            if(k != j && board[i][k] == (num+'0') ) return false;
+            if(k != i && board[k][j] == (num+'0') ) return false;
+        }
+        i = i/3;
+        j = j/3;
+        for (int k = 3*i; k <3*i+3; k++) {
+            for (int l = j*3; l <j*3+3; l++) {
+                if(k!=i && l!=j && board[k][l] == (num+'0')) return false;
+            }
+        }
+        return true;
     }
 
 }
