@@ -6,7 +6,9 @@ package com.greedy;/**
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author zhf
@@ -187,5 +189,70 @@ public class greedy {
         return Arrays.stream(nums).sum();
     }
 
+
+    /**
+     * 134：加油站
+     * @param gas
+     * @param cost
+     * @return
+     */
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        if(cost.length == 1 && gas[0] >= cost[0]) return 0;
+        if(Arrays.stream(gas).sum() < Arrays.stream(cost).sum()) return -1;
+        for (int i = 0; i < gas.length; i++) {
+            int spare = gas[i] - cost[i];
+            if(spare <= 0) continue;
+            for (int j = i+1; j < gas.length + i; j++) {
+                spare += gas[j % gas.length] - cost[j % gas.length];
+                if(spare < 0) break;
+            }
+            if(spare >= 0) return i;
+        }
+        return -1;
+    }
+
+    public int canCompleteCircuit_1(int[] gas, int[] cost) {
+        int n = gas.length;
+        int i = 0;
+        while (i < n) {
+            int sumOfGas = 0, sumOfCost = 0;
+            int cnt = 0;
+            while (cnt < n) {
+                int j = (i + cnt) % n;
+                sumOfGas += gas[j];
+                sumOfCost += cost[j];
+                if (sumOfCost > sumOfGas) {
+                    break;
+                }
+                cnt++;
+            }
+            if (cnt == n) {
+                return i;
+            } else {
+                i = i + cnt + 1;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 135:分发糖果
+     * @param ratings
+     * @return
+     */
+    public int candy(int[] ratings) {
+        int[] candies = new int[ratings.length];
+        candies[0]=1;
+        for (int i = 1; i < ratings.length; i++) {
+            if(ratings[i] > ratings[i-1]) candies[i] = candies[i-1] + 1;
+            else candies[i] = 1;
+        }
+        candies[ratings.length-1] = Math.max(candies[ratings.length-1],1);
+        for (int i = ratings.length-2; i >= 0; i--) {
+            if(ratings[i] > ratings[i+1]) candies[i] = Math.max(candies[i+1] + 1,candies[i]);
+            else candies[i] = Math.max(1,candies[i]);
+        }
+        return Arrays.stream(candies).sum();
+    }
 
 }
