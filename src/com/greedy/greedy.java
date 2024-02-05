@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ import java.util.List;
  * 描述：贪心算法
  * @date 2024/1/21 19:38
  **/
+@SuppressWarnings("all")
 public class greedy {
 
 
@@ -254,5 +256,183 @@ public class greedy {
         }
         return Arrays.stream(candies).sum();
     }
+
+
+    /**
+     * 860：柠檬水找零
+     * @param bills
+     * @return
+     */
+    public boolean lemonadeChange(int[] bills) {
+        int money[] = new int[2];
+        for (int i = 0; i < bills.length; i++) {
+            if(bills[i] == 5) money[0]++;
+            if(bills[i] == 10) {
+                money[1]++;
+                if (money[0] >= 1) {
+                    money[0]--;
+                }else return false;
+            }
+            if(bills[i] == 20){
+                if(money[1] >= 1 && money[0] >= 1){
+                    money[0]--;
+                    money[1]--;
+                }else if(money[0] >= 3){
+                    money[0] -= 3;
+                }else return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 406:根据身高重建队列
+     * @param people
+     * @return
+     */
+    public int[][] reconstructQueue(int[][] people) {
+        Arrays.sort(people, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if(o1[0] != o2[0]){
+                    return o1[0] - o2[0];
+                }else return o2[1] - o1[1];
+            }
+        });
+        int[][] ret = new int[people.length][];
+        for (int[] person : people) {
+            int space = person[1];
+            for (int i = 0; i < people.length; i++) {
+                if(ret[i] == null) {
+                    if(space == 0){
+                        ret[i] = person;
+                        break;
+                    }
+                    space--;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * 452：用最少数量的箭引爆气球
+     * @param points
+     * @return
+     */
+    public int findMinArrowShots(int[][] points) {
+        if(points.length < 1) return 0;
+        Arrays.sort(points,Comparator.comparingInt(e -> e[0]));
+        int count = 0;
+        int[] used = new int[points.length];
+        for (int i = 0; i < points.length; i++) {
+            if(used[i] == 1) continue;
+            count++;
+            int[] arrows = points[i];
+            for (int j = i+1; j < points.length; j++) {
+                if(points[j][0] <= arrows[1]){
+                    arrows = getIntersection(arrows,points[j]);
+                    used[j] = 1;
+                }
+            }
+        }
+        return count;
+    }
+
+    private int[] getIntersection(int[] arrows, int[] point) {
+        arrows[0] = point[0];
+        arrows[1] = Math.min(arrows[1],point[1]);
+        return arrows;
+    }
+
+    public int findMinArrowShots_1(int[][] points) {
+        if(points.length < 1) return 0;
+        Arrays.sort(points,Comparator.comparingInt(e -> e[1]));
+        int count = 1;
+        int[] arrow = points[0];
+        for (int[] point : points) {
+            if(point[0] > arrow[1]){
+                count++;
+                arrow = point;
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * 435：无重叠区间
+     * @param intervals
+     * @return
+     */
+    public int eraseOverlapIntervals(int[][] intervals) {
+        Arrays.sort(intervals, Comparator.comparingInt(e -> e[1]));
+        int count = 0;
+        int[] temp = intervals[0];
+        for (int i = 1; i < intervals.length; i++) {
+            if(intervals[i][0] < temp[1]){
+                count++;
+            }else temp = intervals[i];
+        }
+        return count;
+    }
+
+
+    /**
+     * 763:划分字母区间
+     * @param s
+     * @return
+     */
+    public List<Integer> partitionLabels(String s) {
+        List<Integer> ret = new ArrayList<>();
+        if(s.length() == 1) {ret.add(1); return ret;}
+        char[] charList = s.toCharArray();
+        int[] position = new int[s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            char temp = charList[i];
+            for (int j = s.length() - 1; j >= 0 ; j--) {
+                if(charList[j] == temp) {
+                    position[i] = j;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if(position[i] != i){
+                int max = position[i];
+                for (int j = i+1; j <= max; j++) {
+                    max = Math.max(position[j], max);
+                }
+                ret.add(max+1-i);
+                i = max;
+            }else ret.add(1);
+        }
+        return ret;
+    }
+
+
+    /**
+     * 56:合并区间
+     * @param intervals
+     * @return
+     */
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals,Comparator.comparingInt(e -> e[0]));
+        List<int[]> ret = new ArrayList<>();
+        int[] temp = intervals[0];
+        for (int i = 1; i < intervals.length; i++) {
+            if(intervals[i][0] <= temp[1]){
+                temp[0] = temp[0];
+                temp[1] = Math.max(intervals[i][1],temp[1]);
+            }else {
+                ret.add(temp);
+                temp = intervals[i];
+            }
+        }
+        ret.add(temp);
+        return ret.toArray(new int[0][]);
+    }
+
 
 }
