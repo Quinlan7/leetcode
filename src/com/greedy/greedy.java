@@ -5,6 +5,7 @@ package com.greedy;/**
  */
 
 import org.junit.Test;
+import sun.reflect.generics.tree.Tree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -433,6 +434,93 @@ public class greedy {
         ret.add(temp);
         return ret.toArray(new int[0][]);
     }
+
+
+    /**
+     * 738：单调递增的数字
+     * @param n
+     * @return
+     */
+    public int monotoneIncreasingDigits(int n) {
+        //处理输入
+        int bitCount = String.valueOf(n).length();
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0;i < bitCount; i++) {
+            list.add(((int) (n / Math.pow(10 , i))) % 10);
+        }
+        //处理 要减一位 的特殊情况
+        int valat = 0;
+        for (int j = 0; j < list.size() - 1 ; j++) {
+            valat += list.get(j) * Math.pow(10,j);
+        }
+        if(list.get(list.size()-1) == 1 && valat == 0) return n-1;
+        //从 百位 十位 个位 这个顺序递增
+        int temp = 0;
+        for (int j = 1; j < list.size(); j++) {
+            if(list.get(j) > list.get(j-1)){
+                list.set(j,list.get(j)-1);
+                temp = j;
+            }
+        }
+        for (int j = temp - 1 ; j >= 0 ; j--) {
+            list.set(j,9);
+        }
+        //结果求和
+        int ret = 0;
+        for (int j = 0; j < list.size(); j++) {
+            ret += list.get(j) * Math.pow(10,j);
+        }
+        return ret;
+    }
+
+
+    /**
+     * 968:监控二叉树
+     * @param root
+     * @return
+     */
+     public class TreeNode {
+         int val;
+         TreeNode left;
+         TreeNode right;
+         TreeNode() {}
+         TreeNode(int val) { this.val = val; }
+         TreeNode(int val, TreeNode left, TreeNode right) {
+             this.val = val;
+             this.left = left;
+             this.right = right;
+         }
+     }
+
+     int ret_968 = 0;
+     public int minCameraCover(TreeNode root) {
+         if(traversal(root) == 0) ret_968++;
+         return ret_968;
+    }
+
+    // 后序遍历： 左右中
+
+    /**
+     * 0：无覆盖
+     * 1：有摄像头
+     * 2：有覆盖
+     * @param root
+     * @return
+     */
+    int traversal(TreeNode root){
+        if(root == null) return 2;
+        int left = traversal(root.left);
+        int right = traversal(root.right);
+        if(left == 2 && right == 2 ) return 0;
+        else if((left == 1 && right == 1)||(left == 2 && right == 1) ||(left == 1 && right == 2)) return 2;
+        else{
+            ret_968++;
+            return 1;
+        }
+    }
+
+
+
 
 
 }
