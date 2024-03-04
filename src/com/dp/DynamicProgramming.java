@@ -6,7 +6,9 @@ package com.dp;/**
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author zhf
@@ -376,6 +378,52 @@ public class DynamicProgramming {
             }
         }
         return dp[amount];
+    }
+
+
+    /**
+     * 279: 完全平方数
+     * @param n
+     * @return
+     */
+    public int numSquares(int n) {
+        int[] dp = new int[n+1];
+        Arrays.fill(dp,Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int i = 1; i*i <= n ; i++) {
+            for (int j = i*i; j < n + 1; j++) {
+                dp[j] = Math.min(dp[j],dp[j-(i*i)]+1);
+            }
+        }
+        return dp[n];
+    }
+
+
+    /**
+     * 139: 单词拆分
+     * @param s
+     * @param wordDict
+     * @return
+     */
+    @Test
+    public void test_139(){
+        String s = "leetcode";
+        List<String> strings = new ArrayList<>();
+        strings.add("leet");
+        strings.add("code");
+        wordBreak(s,strings);
+    }
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        for (int j = 1; j < s.length() + 1; j++) {
+            for (int i = 0; i < wordDict.size(); i++) {
+                if(j>=wordDict.get(i).length()){
+                    dp[j] = (dp[j-wordDict.get(i).length()] && wordDict.get(i).equals(s.substring(j-wordDict.get(i).length(),j))) || dp[j];
+                }
+            }
+        }
+        return dp[s.length()];
     }
 
 
