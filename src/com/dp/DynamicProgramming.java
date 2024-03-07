@@ -6,9 +6,8 @@ package com.dp;/**
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * @author zhf
@@ -425,6 +424,70 @@ public class DynamicProgramming {
         }
         return dp[s.length()];
     }
+
+
+    /**
+     * 198: 打家劫舍
+     * @param nums
+     * @return
+     */
+    public int rob(int[] nums) {
+        if(nums.length == 1) return nums[0];
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0],nums[1]);
+        for (int i = 2; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i-1],dp[i-2]+nums[i]);
+        }
+        return dp[nums.length-1];
+    }
+
+    /**
+     * 213: 打家劫舍II
+     * @param nums
+     * @return
+     */
+    public int rob2(int[] nums) {
+        if(nums.length == 1) return nums[0];
+        if(nums.length == 2) return Math.max(nums[0],nums[1]);
+        return Math.max(rob(Arrays.copyOfRange(nums,0,nums.length-1)),rob(Arrays.copyOfRange(nums,1,nums.length)));
+    }
+
+     public class TreeNode {
+         int val;
+         TreeNode left;
+         TreeNode right;
+         TreeNode() {}
+         TreeNode(int val) { this.val = val; }
+         TreeNode(int val, TreeNode left, TreeNode right) {
+             this.val = val;
+             this.left = left;
+             this.right = right;
+         }
+     }
+
+    /**
+     * 337:打家劫舍III
+     * @param root
+     * @return
+     */
+    Map<TreeNode, Integer> f = new HashMap<TreeNode, Integer>();
+    Map<TreeNode, Integer> g = new HashMap<TreeNode, Integer>();
+    public int rob3(TreeNode root) {
+        dfs(root);
+        return Math.max(f.getOrDefault(root, 0), g.getOrDefault(root, 0));
+    }
+
+    public void dfs(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+        dfs(node.left);
+        dfs(node.right);
+        f.put(node, node.val + g.getOrDefault(node.left, 0) + g.getOrDefault(node.right, 0));
+        g.put(node, Math.max(f.getOrDefault(node.left, 0), g.getOrDefault(node.left, 0)) + Math.max(f.getOrDefault(node.right, 0), g.getOrDefault(node.right, 0)));
+    }
+
 
 
 }
