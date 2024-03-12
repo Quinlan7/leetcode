@@ -489,5 +489,108 @@ public class DynamicProgramming {
     }
 
 
+    /**
+     * 121: 买卖股票的最佳时机
+     * @param prices
+     * @return
+     */
+    public int maxProfit(int[] prices) {
+        if(prices.length == 1) return 0;
+        int dp = Math.max(prices[1] - prices[0],0);
+        int min = Math.min(prices[0],prices[1]);
+        for (int i = 2; i < prices.length; i++) {
+            dp = Math.max(prices[i] - min,dp);
+            min = Math.min(min,prices[i]);
+        }
+        return dp;
+    }
+
+    /**
+     * 123: 买卖股票的最佳时机III
+     * 用了全力优化，可是最后一个测试用例还是过不了
+     * @param prices
+     * @return
+     */
+    public int maxProfitIII(int[] prices) {
+        if(prices.length == 1) return 0;
+        int dp = maxProfit(prices);
+        int min = Math.min(prices[0],prices[1]);
+        int temp = Math.max(prices[1] - prices[0],0);
+        if(prices.length == 2) return temp;
+        for (int i = 2; i < prices.length; i++) {
+            if(prices[i-1] - min >= temp) {
+                temp = prices[i-1] - min;
+                dp = Math.max((temp + maxProfit(Arrays.copyOfRange(prices, i, prices.length))),dp);
+            }else min = Math.min(min,prices[i-1]);
+        }
+        return dp;
+    }
+
+    public int maxProfitIII2(int[] prices) {
+        int n = prices.length;
+        int buy1 = -prices[0], sell1 = 0;
+        int buy2 = -prices[0], sell2 = 0;
+        for (int i = 1; i < n; ++i) {
+            buy1 = Math.max(buy1, -prices[i]);
+            sell1 = Math.max(sell1, buy1 + prices[i]);
+            buy2 = Math.max(buy2, sell1 - prices[i]);
+            sell2 = Math.max(sell2, buy2 + prices[i]);
+        }
+        return sell2;
+    }
+
+
+    public int maxProfitIV(int k, int[] prices) {
+        if(prices.length == 1) return 0;
+        int[] dp = new int[prices.length];
+        dp[0] = -prices[0];
+        for (int i = 1; i < prices.length; i++) {
+            dp[i] = Math.max(dp[i-1],-prices[i]);
+        }
+        for (int i = 1; i < 2 * k; i++) {
+            dp[0] = i % 2 == 0? -prices[0] : 0 ;
+            for (int j = 1; j < prices.length; j++) {
+                dp[j] = i % 2 == 0? Math.max(dp[j-1],dp[j] - prices[j]) : Math.max(dp[j-1],dp[j]+prices[j]);
+            }
+        }
+        return dp[prices.length-1];
+    }
+
+    /**
+     * 309: 买卖股票的最佳时机含冷冻期
+     * @param prices
+     * @return
+     */
+    public int maxProfitFrozen(int[] prices) {
+        if(prices.length == 1) return 0;
+        if(prices.length == 2) return Math.max(0,prices[1] - prices[0]);
+        int[] bug = new int[prices.length];
+        int[] sell = new int[prices.length];
+        bug[0] = - prices[0];bug[1] = Math.max(- prices[0],- prices[1]);
+        sell[0] = 0; sell[1] = Math.max(0,prices[1] - prices[0]);
+        for (int i = 2; i < prices.length; i++) {
+            bug[i] = Math.max(sell[i-2] - prices[i],bug[i-1]);
+            sell[i] = Math.max(sell[i-1],bug[i]+prices[i]);
+        }
+        return sell[prices.length-1];
+    }
+
+
+    /**
+     * 714: 买卖股票的最佳时机含手续费
+     * @param prices
+     * @param fee
+     * @return
+     */
+    public int maxProfitCommission(int[] prices, int fee) {
+        if(prices.length == 1) return 0;
+        int buy = -prices[0];
+        int sell = 0;
+        for (int i = 1; i < prices.length; i++) {
+            buy = Math.max(sell - prices[i],buy);
+            sell = Math.max(sell,buy + prices[i] - fee);
+        }
+        return sell;
+    }
 
 }
