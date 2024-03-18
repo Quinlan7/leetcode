@@ -593,4 +593,173 @@ public class DynamicProgramming {
         return sell;
     }
 
+
+    /**
+     * 300: 最长递增子序列
+     * @param nums
+     * @return
+     */
+    @Test
+    public void test_300(){
+        int[] nums = new int[]{1,3,6,7,9,4,10,5,6};
+        lengthOfLIS(nums);
+    }
+    public int lengthOfLIS(int[] nums) {
+        if(nums.length == 1) return 1;
+        int[] dp = new int[nums.length];
+        dp[0] = 1;
+        for (int i = 1; i < nums.length; i++) {
+            dp[i] = 1;
+            for (int j = i-1; j >= 0 ; j--) {
+                if(nums[j] < nums[i]){
+                    dp[i] = Math.max(dp[i],dp[j]+1);
+                }
+            }
+        }
+        return Arrays.stream(dp).max().getAsInt();
+    }
+
+
+    /**
+     * 674: 最长连续递增序列
+     * @param nums
+     * @return
+     */
+    public int findLengthOfLCIS(int[] nums) {
+        if(nums.length == 1) return 1;
+        int max = 0,temp = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if(nums[i] > nums[i-1]) temp++;
+            else {
+                temp = 1;
+            }
+            max = Math.max(temp,max);
+        }
+        return max;
+    }
+
+    /**
+     * 718: 最长重复子数组
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int findLength(int[] nums1, int[] nums2) {
+        int max = 0 , temp = 0 ;
+        for (int i = 0; i < nums1.length; i++) {
+            for (int j = 0; j < nums2.length; j++) {
+                if(nums1[i] == nums2[j]){
+                    temp++;
+                    for (int m = i+1, n = j+1; m<nums1.length && n<nums2.length && nums1[m] == nums2[n] ; m++,n++) {
+                        temp++;
+                    }
+                    max = Math.max(temp,max);
+                    temp = 0;
+                }
+            }
+        }
+        return max;
+    }
+
+    // 动态规划的解法：对于dp的定义：最长公共前缀长
+
+    public int findLength2(int[] A, int[] B) {
+        int n = A.length, m = B.length;
+        int[][] dp = new int[n + 1][m + 1];
+        int ans = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = m - 1; j >= 0; j--) {
+                dp[i][j] = A[i] == B[j] ? dp[i + 1][j + 1] + 1 : 0;
+                ans = Math.max(ans, dp[i][j]);
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 1143：最长公共子序列
+     * @param text1
+     * @param text2
+     * @return
+     */
+    @Test
+    public void test_1143(){
+        longestCommonSubsequence("abcba","abcbcba");
+    }
+    public int longestCommonSubsequence(String text1, String text2) {
+        int[][] dp = new int[text1.length()+1][text2.length()+1];
+        for (int i = 1; i < text1.length() + 1; i++) {
+            for (int j = 1; j < text2.length() + 1; j++) {
+                if(text1.charAt(i-1) == text2.charAt(j-1)) dp[i][j] = dp[i-1][j-1]+1;
+                else dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+            }
+        }
+
+        return dp[text1.length()][text2.length()];
+    }
+
+
+    /**
+     * 1035: 不相交的线
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int maxUncrossedLines(int[] nums1, int[] nums2) {
+        int[][] dp = new int[nums1.length+1][nums2.length+1];
+        for (int i = 1; i < nums1.length + 1; i++) {
+            for (int j = 1; j < nums2.length + 1; j++) {
+                if(nums1[i-1] == nums2[j-1]) dp[i][j] = dp[i-1][j-1]+1;
+                else dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+            }
+        }
+        return dp[nums1.length][nums2.length];
+    }
+
+
+    /**
+     * 392: 判断子序列
+     * @param s
+     * @param t
+     * @return
+     */
+    public boolean isSubsequence(String s, String t) {
+        if(s.length() == 0) return true;
+        int j = 0;
+        for (int i = 0; i < s.length(); i++) {
+            for (; j < t.length(); j++) {
+                if(s.charAt(i) == t.charAt(j)) {
+                    if(i == s.length()-1 ) return true;
+                    j++;
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 115: 不同的子序列
+     * @param s
+     * @param t
+     * @return
+     */
+    public int numDistinct(String s, String t) {
+        int[][] dp = new int[t.length()+1][s.length()+1];
+        for (int i = 0; i < s.length() + 1; i++) {
+            dp[0][i] = 1;
+        }
+        for (int i = 1; i < t.length() + 1; i++) {
+            for (int j = 1; j < s.length() + 1; j++) {
+                if(s.charAt(j-1) == t.charAt(i-1)) dp[i][j] = dp[i-1][j-1] + dp[i][j-1];
+                else dp[i][j] = dp[i][j-1];
+            }
+        }
+        return dp[t.length()][s.length()];
+    }
+
+
+
 }
