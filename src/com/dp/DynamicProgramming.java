@@ -761,5 +761,115 @@ public class DynamicProgramming {
     }
 
 
+    /**
+     * 583: 两个字符串的删除操作
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance(String word1, String word2) {
+        int[][] dp = new int[word1.length()+1][word2.length()+1];
+        for (int i = 1; i < word1.length() + 1; i++) {
+            for (int j = 1; j < word2.length() + 1; j++) {
+                if(word1.charAt(i-1) == word2.charAt(j-1)) dp[i][j] = dp[i-1][j-1]+1;
+                else dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+            }
+        }
+
+        return word1.length()+word2.length()-2*dp[word1.length()][word2.length()];
+    }
+
+
+    /**
+     * 72: 编辑距离
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance_72(String word1, String word2) {
+        int[][] dp = new int[word1.length()+1][word2.length()+1];
+        for (int i = 0; i < word1.length() + 1; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j < word2.length() + 1; j++) {
+            dp[0][j] = j;
+        }
+        for (int i = 1; i < word1.length() + 1; i++) {
+            for (int j = 1; j < word2.length() + 1; j++) {
+                if(word1.charAt(i-1) == word2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1];
+                }else dp[i][j] = Math.min(dp[i-1][j-1]+1 ,Math.min(dp[i-1][j]+1,dp[i][j-1]+1));
+            }
+        }
+        return dp[word1.length()][word2.length()];
+    }
+
+
+    /**
+     * 647:回文子串
+     * @param s
+     * @return
+     */
+    public int countSubstrings(String s) {
+        int[] dp = new int[s.length()];
+        dp[0] = 1;
+        for (int i = 1; i < s.length(); i++) {
+            dp[i] = dp[i-1] + 1;
+            for (int j = 0; j < i; j++) {
+                dp[i] += isPalindrome(s.substring( j, i+1));
+            }
+        }
+        return dp[s.length()-1];
+    }
+
+    private int isPalindrome(String s){
+        int i = s.length()/2;
+        for (int j = 0; j < i; j++) {
+            if(s.charAt(j) != s.charAt(s.length()-1-j)) return 0;
+        }
+        return 1;
+    }
+    // 动态规划
+
+    public int countSubstrings2(String s) {
+        int[][] dp = new int[s.length()][s.length()];
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            dp[i][i] = 1;
+            count += dp[i][i];
+        }
+        for (int i = s.length()-2; i >= 0; i--) {
+            for (int j = i+1; j < s.length(); j++) {
+                if(j-1 == i){
+                    dp[i][j] = (s.charAt(i) == s.charAt(j)) ? 1:0;
+                }else dp[i][j] = (s.charAt(i) == s.charAt(j) && dp[i+1][j-1] == 1) ? 1:0;
+                count += dp[i][j];
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * 516: 最长回文子序列
+     * @param s
+     * @return
+     */
+    public int longestPalindromeSubseq(String s) {
+        int[][] dp = new int[s.length()][s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            dp[i][i] = 1;
+        }
+        for (int i = s.length()-2; i >= 0; i--) {
+            for (int j = i+1; j < s.length(); j++) {
+                if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = dp[i+1][j-1] + 2;
+                }else dp[i][j] = Math.max(dp[i+1][j],dp[i][j-1]);
+            }
+        }
+        return dp[0][s.length()-1];
+    }
+
+
 
 }
