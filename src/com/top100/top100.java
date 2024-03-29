@@ -94,4 +94,123 @@ public class top100 {
     }
 
 
+    /**
+     * 11: 盛最多水的容器
+     * * @param height
+     * @return
+     */
+    // 暴力解，超时
+    public int maxArea1(int[] height) {
+        int max = 0;
+        for (int i = 0; i < height.length-1; i++) {
+            for (int j = i+1; j < height.length; j++) {
+                max = Math.max(max,Math.min(height[i],height[j]) * (j-i));
+            }
+        }
+        return max;
+    }
+
+    public int maxArea2(int[] height) {
+        int max = 0;
+        int left = 0;
+        int right = height.length-1;
+        while (left < right) {
+            max = Math.max(max,Math.min(height[left],height[right]) * (right-left));
+            if(height[left] < height[right]) left++;
+            else right--;
+        }
+        return max;
+    }
+
+
+    /**
+     * 42: 接雨水
+     * @param height
+     * @return
+     */
+    public int trap(int[] height) {
+        int count = 0;
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 1; i < height.length; i++) {
+            if(height[i-1] > height[i]) stack.push(i-1);
+            if(height[i-1] < height[i]){
+                if(stack.isEmpty()) continue;
+
+                int min = Math.min(height[i],height[stack.peek()]);
+                count += (i-stack.peek()-1) * (min - height[i-1]);
+                for (int j = stack.peek()+1; j < i; j++) {
+                    height[j] = min;
+                }
+                if(height[stack.peek()] < height[i]) i--;
+                if(height[stack.peek()] <= height[i]) stack.pop();
+
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * 3: 无重复字符的最长字串
+     * @param s
+     * @return
+     */
+    public int lengthOfLongestSubstring(String s) {
+        if(s.isEmpty()) return 0;
+        Map<Character,Integer> map = new HashMap<>();
+        map.put(s.charAt(0),0);
+        int left = 0,right = 1;
+        int max = 1;
+        for (; right < s.length(); ) {
+            char temp = s.charAt(right);
+            if(!map.containsKey(temp)){
+                map.put(temp,right);
+                right++;
+                max = Math.max(right - left,max);
+            }else {
+                int repeat = map.get(temp);
+                for (int i = left; i < repeat; i++) {
+                    map.remove(s.charAt(i));
+                }
+                left = repeat+1;
+                map.put(temp,right);
+                right++;
+            }
+        }
+        return max;
+    }
+
+
+    /**
+     * 438: 找到字符串中所有字母异位词
+     * @param s
+     * @param p
+     * @return
+     */
+    public List<Integer> findAnagrams(String s, String p) {
+        if(s.length()<p.length()) return new ArrayList<>();
+        List<Integer> ret = new ArrayList<>();
+        Map<Character,Integer> pCount = new HashMap<>();
+        Map<Character,Integer> sCount = new HashMap<>();
+        for (int i = 0; i < p.length(); i++) {
+            pCount.put(p.charAt(i),pCount.getOrDefault(p.charAt(i),0)+1);
+        }
+        for (int i = 0; i < p.length(); i++) {
+            sCount.put(s.charAt(i),sCount.getOrDefault(s.charAt(i),0)+1);
+        }
+        int left = 0,right = p.length();
+        for (; right < s.length(); right++,left++) {
+            if(pCount.equals(sCount)) ret.add(left);
+            char leftChar = s.charAt(left);
+            if(sCount.get(leftChar) == 1) sCount.remove(leftChar);
+            else sCount.put(leftChar,sCount.get(leftChar)-1);
+            sCount.put(s.charAt(right),sCount.getOrDefault(s.charAt(right),0)+1);
+        }
+        if(pCount.equals(sCount)) ret.add(left);
+        return ret;
+    }
+
+
+
+
 }
