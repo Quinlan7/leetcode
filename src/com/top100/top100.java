@@ -211,6 +211,260 @@ public class top100 {
     }
 
 
+    /**
+     * 560: 和为k的子数组
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int subarraySum(int[] nums, int k) {
+        if(nums.length == 1) return nums[0] == k  ? 1:0;
+        int ret = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int sum = 0;
+            for (int j = i; j < nums.length; j++) {
+                sum += nums[j];
+                if(sum == k) ret++;
+            }
+        }
+        return ret;
+    }
+
+
+    public int subarraySum2(int[] nums, int k) {
+        int count = 0, pre = 0;
+        HashMap < Integer, Integer > mp = new HashMap < > ();
+        mp.put(0, 1);
+        for (int i = 0; i < nums.length; i++) {
+            pre += nums[i];
+            if (mp.containsKey(pre - k)) {
+                count += mp.get(pre - k);
+            }
+            mp.put(pre, mp.getOrDefault(pre, 0) + 1);
+        }
+        return count;
+    }
+
+
+    /**
+     * 76: 最小覆盖子串
+     * @param s
+     * @param t
+     * @return
+     */
+    public String minWindow(String s, String t) {
+        if(t.length() > s.length()) return "";
+        Map<Character,Integer> tCount = new HashMap<>();
+        for (int i = 0; i < t.length(); i++) {
+            tCount.put(t.charAt(i), tCount.getOrDefault(t.charAt(i),0)+1 );
+        }
+        Map<Character,Integer> sCount = new HashMap<>();
+        Map<Character,Queue<Integer>> index = new HashMap<>();
+        String ret = "" ;
+        for (int i = 0; i < s.length(); i++) {
+            if(tCount.containsKey(s.charAt(i)) && sCount.getOrDefault(s.charAt(i),0) < tCount.getOrDefault(s .charAt(i),0)){
+                Queue<Integer> queue = index.getOrDefault(s.charAt(i), new LinkedList<>());
+                queue.offer(i);
+                index.put(s.charAt(i) , queue );
+                sCount.put(s.charAt(i), sCount.getOrDefault(s.charAt(i),0)+1 );
+            } else if (tCount.containsKey(s.charAt(i)) && Objects.equals(sCount.getOrDefault(s.charAt(i), 0), tCount.getOrDefault(s.charAt(i), 0))) {
+                Queue<Integer> queue = index.getOrDefault(s.charAt(i), new LinkedList<>());
+                queue.offer(i);
+                queue.poll();
+                index.put(s.charAt(i) , queue );
+            }
+            if(tCount.equals(sCount)){
+                int begin = index
+                        .values()
+                        .stream()
+                        .map(Queue::peek)
+                        .min(Comparator.naturalOrder())
+                        .get();
+                if (ret.equals("") || i+1 - begin < ret.length()) {
+                    ret = s.substring(begin,i+1);
+                }
+                sCount.put(s.charAt(begin) , sCount.get(s.charAt(begin))-1 );
+                Queue<Integer> queue = index.getOrDefault(s.charAt(begin), new LinkedList<>());
+                queue.poll();
+                index.put(s.charAt(begin) , queue );
+            }
+        }
+        return ret;
+    }
+
+
+    /**
+     * 189: 轮转数组
+     * @param nums
+     * @param k
+     */
+    public void rotate(int[] nums, int k) {
+        int n = nums.length;
+        int[] newArr = new int[n];
+        for (int i = 0; i < n; ++i) {
+            newArr[(i + k) % n] = nums[i];
+        }
+        System.arraycopy(newArr, 0, nums, 0, n);
+    }
+
+    /**
+     * 41:缺失的第一个正数
+     * @param nums
+     * @return
+     */
+    public int firstMissingPositive(int[] nums) {
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(Comparator.naturalOrder());
+        for (int i = 0; i < nums.length; i++) {
+            if(nums[i] > 0) priorityQueue.offer(nums[i]);
+        }
+        int ret = 0;
+        int temp = 0;
+        if(priorityQueue.isEmpty()) return 1;
+        do {
+            ret++;
+            while( !priorityQueue.isEmpty() && priorityQueue.peek() < ret){
+                priorityQueue.poll();
+            }
+            if(priorityQueue.isEmpty()) return ret;
+            temp = priorityQueue.poll();
+        }while(temp == ret && !priorityQueue.isEmpty());
+        return temp == ret? ret+1 : ret ;
+    }
+
+    public int firstMissingPositive2(int[] nums) {
+        HashSet<Integer> set = new HashSet<>();
+        int ret = 1;
+        for (int i = 0; i < nums.length; i++) {
+            if(nums[i] == ret) ret++;
+            else if(nums[i] > 0) set.add(nums[i]);
+        }
+        while(!set.isEmpty()){
+            if(set.contains(ret)) {
+                ret++;
+                continue;
+            }else return ret;
+        }
+        return ret;
+    }
+
+    /**
+     * 常数的空间复杂度，O(n)的时间复杂度
+     * 其实无论如何都需要一个 哈希表 来存储状态。但是我们可以修改 输入数组！！！！
+     * @param nums
+     * @return
+     */
+    public int firstMissingPositive3(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            if(nums[i] <= 0) nums[i] = nums.length+1;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if(Math.abs(nums[i]) <= nums.length) nums[Math.abs(nums[i]) - 1] = -Math.abs(nums[Math.abs(nums[i]) - 1]);
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if(nums[i] > 0) return i+1;
+        }
+        return nums.length+1;
+    }
+
+
+    /**
+     * 73: 矩阵置零
+     * @param matrix
+     */
+    public void setZeroes(int[][] matrix) {
+        int flag = -11;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if(matrix[i][j] == flag ) matrix[i][j] = Math.abs(matrix[i][j]);
+                if(matrix[i][j] == 0) matrix[i][j] = flag;
+            }
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if(matrix[i][j] == flag){
+                    matrix[i][j] = 0;
+                    for (int k = 0; k < matrix.length; k++) {
+                        if (matrix[k][j] != flag) {
+                            matrix[k][j] = 0;
+                        }
+                    }
+                    for (int k = 0; k < matrix[0].length; k++) {
+                        if (matrix[i][k] != flag) {
+                            matrix[i][k] = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    /**
+     * 54: 螺旋矩阵
+     * @param matrix
+     * @return
+     */
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> ret = new ArrayList<>();
+        int i = 0;
+        int j = 0;
+        int count = matrix.length * matrix[0].length;
+        boolean[][] visited = new boolean[matrix.length][matrix[0].length];
+        // false + , true -
+        // flag false 列，true 行
+        boolean flag = false,toggle = false;
+        for ( ; ret.size() < count; ) {
+            for ( ; ret.size() < count; ) {
+                ret.add(matrix[i][j]);
+                visited[i][j] = true;
+                //列的变化
+                if(!flag){
+                    // ++
+                    if (!toggle) {
+                        // 未达到边界
+                        if( j < matrix[0].length-1 && !visited[i][j+1]) j++;
+                        // 达到边界
+                        else  {
+                            i++;
+                            flag = true;
+                        }
+                    }else {
+                        // 未达到边界
+                        if( j > 0 && !visited[i][j-1]) j--;
+                        // 达到边界
+                        else  {
+                            i--;
+                            flag = true;
+                        }
+                    }
+                }else {
+                    // ++
+                    if (!toggle) {
+                        // 未达到边界
+                        if( i < matrix.length-1 && !visited[i+1][j]) i++;
+                        // 达到边界
+                        else {
+                            j--;
+                            flag = false;
+                            toggle = true;
+                        }
+                    }else {
+                        // 未达到边界
+                        if( i > 0 && !visited[i-1][j]) i--;
+                        // 达到边界
+                        else {
+                            j++;
+                            flag = false;
+                            toggle = false;
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
 
 
 }
