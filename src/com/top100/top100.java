@@ -466,5 +466,210 @@ public class top100 {
     }
 
 
+    /**
+     * 48: 旋转图像
+     * @param matrix
+     */
+    public void rotate(int[][] matrix) {
+        int k = matrix.length / 2;
+        int n = matrix.length;
+        int x = 0, y = 0;
+        // i 控制 第几环
+        for (int i = 0; i < k; i++) {
+            // j 控制 第几个
+            for (int j = 0; j < n - 1 - 2*i; j++) {
+                int nextValue = matrix[x+i + j][n-1-i];
+                //上 -> 右
+                matrix[x+i + j][n-1-i] = matrix[x+i][y+i + j];
+                //右 -> 下
+                int temp = nextValue;
+                nextValue = matrix[n-1 -i ][n-1 -i -j];
+                matrix[n-1 -i ][n-1 -i -j] = temp;
+                //下 -> 左
+                temp = nextValue;
+                nextValue = matrix[n-1 -i -j][y + i];
+                matrix[n-1 -i -j][y + i] = temp;
+                //左 -> 上
+                temp = nextValue;
+//                nextValue = matrix[n-1 -i -j][y + i];
+                matrix[x + i][y + i + j] = temp;
+            }
+        }
+    }
+
+
+    /**
+     * 240: 搜索二位矩阵II
+     * @param matrix
+     * @param target
+     * @return
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        Queue<List<Integer>> queue = new LinkedList<>();
+        if(matrix[0][0] == target) return true;
+        boolean[][] visited = new boolean[matrix.length][matrix[0].length];
+        List<Integer> position = new ArrayList<>();
+        position.add(0);
+        position.add(0);
+        queue.add(position);
+        visited[0][0] = true;
+        while(!queue.isEmpty()){
+            position = queue.poll();
+            int x = position.get(0);
+            int y = position.get(1);
+            if (x+1 < matrix.length && !visited[x + 1][y]) {
+                if(matrix[x + 1][y] == target) return true;
+                else if (matrix[x + 1][y] < target){
+                    List<Integer> temp = new ArrayList<>();
+                    temp.add(x + 1);
+                    temp.add(y);
+                    queue.add(temp);
+                }
+                visited[x + 1][y] = true;
+            }
+            if (y+1 < matrix[0].length && !visited[x][y + 1]) {
+                if(matrix[x][y+1] == target) return true;
+                else if (matrix[x][y + 1] < target){
+                    List<Integer> temp = new ArrayList<>();
+                    temp.add(x);
+                    temp.add(y+1);
+                    queue.add(temp);
+                }
+                visited[x][y+1] = true;
+            }
+        }
+        return false;
+    }
+
+
+    public class ListNode {
+      int val;
+      ListNode next;
+      ListNode() {}
+      ListNode(int val) { this.val = val; }
+      ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+    }
+
+    /**
+     * 234: 回文链表
+     * @param head
+     * @return
+     */
+
+    public boolean isPalindrome(ListNode head) {
+        ListNode fast = new ListNode(0,head);
+        ListNode slow = new ListNode(0,head);
+        // true oushu , false jishu
+        boolean falg;
+        while(true){
+            if(fast.next == null){
+                reverse(slow);
+                falg = true;
+                break;
+            }else if(fast.next.next == null){
+                reverse(slow.next);
+                falg = false;
+                break;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        if(!falg){
+            slow = slow.next;
+        }
+        while(slow.next != null){
+            if(head.val != slow.next.val) return false;
+            head = head.next;
+            slow = slow.next;
+        }
+        return true;
+    }
+
+    public ListNode reverse(ListNode pre){
+        if(pre.next == null) return pre;
+        ListNode last = pre.next;
+        ListNode now = pre.next.next;
+        if(now == null) return pre;
+        while(true){
+            if(now.next == null){
+                now.next = pre.next;
+                pre.next = now;
+                last.next = null;
+                return pre;
+            }
+            ListNode next = now.next;
+            now.next = pre.next;
+            pre.next = now;
+            last.next = next;
+
+            now = last.next;
+        }
+    }
+
+
+    /**
+     * 141：环形链表
+     * @param head
+     * @return
+     */
+    public boolean hasCycle(ListNode head) {
+        ListNode fast = new ListNode(0,head);
+        ListNode slow = new ListNode(0,head);
+        while(true){
+            if(fast.next==null || fast.next.next==null) return false;
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast) return true;
+        }
+    }
+
+
+    /**
+     * 21: 合并两个有序链表
+     * @param list1
+     * @param list2
+     * @return
+     */
+    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode now1 = list1;
+        ListNode now2 = list2;
+        if(list1 == null || list2==null) return list1==null?list2:list1;
+        ListNode pre = list1.val < list2.val? list1: list2;
+        boolean falg = false;
+        if(list1.val < list2.val){
+            falg = true;
+            now1 = list1.next;
+        }else now2 = list2.next;
+        ListNode next1 = null;
+        ListNode next2 = null;
+        if (now1 != null && now2 != null) {
+            next1 = now1.next;
+            next2 = now2.next;
+        }
+        while(now1 != null && now2 != null){
+            if(now1.val<now2.val){
+                pre.next = now1;
+                pre = now1;
+                now1 = next1;
+                next1 = next1==null? null:next1.next;
+            }else {
+                pre.next = now2;
+                pre = now2;
+                now2 = next2;
+                next2 = next2==null? null:next2.next;
+            }
+        }
+        if(now1 == null){
+            pre.next = now2;
+        }else {
+            pre.next = now1;
+        }
+
+        if(falg) return list1;
+        return list2;
+    }
+
+
+
 
 }
