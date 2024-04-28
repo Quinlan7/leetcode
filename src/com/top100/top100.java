@@ -7,6 +7,8 @@ package com.top100;/**
 import org.junit.Test;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * @author zhf
@@ -667,6 +669,330 @@ public class top100 {
 
         if(falg) return list1;
         return list2;
+    }
+
+
+    /**
+     * 2:两数相加
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        int promotion = 0;
+        ListNode head = new ListNode();
+        ListNode last = head;
+        while(l1!=null || l2 !=null || promotion!=0){
+            int temp = (l1 == null? 0:l1.val) + (l2==null ? 0:l2.val) + promotion;
+            ListNode listNode = new ListNode(temp % 10);
+            promotion = temp / 10;
+            last.next = listNode;
+            last = last.next;
+            l1 = l1 == null? l1:l1.next;
+            l2 = l2 == null? l2:l2.next;
+        }
+        return head.next;
+    }
+
+
+    /**
+     * 25:K个一组翻转链表
+     * @param head
+     * @param k
+     * @return
+     */
+    @Test
+    public void test_25(){
+        ListNode listNode5 = new ListNode(5,null);
+        ListNode listNode4 = new ListNode(4,listNode5);
+        ListNode listNode3 = new ListNode(3,listNode4);
+        ListNode listNode2 = new ListNode(2,listNode3);
+        ListNode listNode1 = new ListNode(1,listNode2);
+        reverseKGroup(listNode1,2);
+    }
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode listNode = new ListNode(0,head);
+        head = listNode;
+        int index = 0;
+        while(head != null){
+            if(index % k == 0) reverseK(head,k);
+            index++;
+            head = head.next;
+        }
+        return listNode.next;
+    }
+
+    public ListNode reverseK(ListNode pre, int k){
+        if(k == 1) return pre;
+        int length = -1;
+        ListNode listNode = pre;
+        while (length < k && listNode != null){
+            listNode = listNode.next;
+            length++;
+        }
+        if(length < k) return pre;
+        ListNode last = pre.next;
+        ListNode now = pre.next.next;
+        length = 1;
+        while(length < k){
+            if(now.next == null){
+                now.next = pre.next;
+                pre.next = now;
+                last.next = null;
+                return pre;
+            }
+            ListNode next = now.next;
+            now.next = pre.next;
+            pre.next = now;
+            last.next = next;
+
+            now = last.next;
+            length++;
+        }
+        return pre;
+    }
+
+    class Node {
+        int val;
+        Node next;
+        Node random;
+
+        public Node(int val) {
+            this.val = val;
+            this.next = null;
+            this.random = null;
+        }
+    }
+
+
+    /**
+     * 138:随机链表的赋值
+     * @param head
+     * @return
+     */
+    public Node copyRandomList(Node head) {
+        if(head == null) return null;
+        Node temp = head;
+        int length = 1;
+        while(temp.next != null){
+            length++;
+            temp = temp.next;
+        }
+        temp = head;
+        Node newHead = new Node(temp.val);
+        Node newTemp = newHead;
+        while(temp.next != null){
+            Node node = new Node(temp.next.val);
+            newTemp.next = node;
+            newTemp = node;
+            temp = temp.next;
+        }
+//        Node node = new Node(temp.val);
+//        newTemp.next = node;
+        newTemp = newHead;
+        temp = head;
+        while(newTemp!=null && temp!=null){
+            Node now = temp.random;
+            if(now == null) newTemp.random = null;
+            int position = 0;
+            while(now != null){
+                position++;
+                now = now.next;
+            }
+            position = length - position;
+            Node find = newHead;
+            for (int i = 0; i < position; i++) {
+                find = find.next;
+            }
+            newTemp.random = find;
+            newTemp = newTemp.next;
+            temp = temp.next;
+
+        }
+        return newHead;
+    }
+
+
+    /**
+     * 148:排序链表
+     * @param head
+     * @return
+     */
+    @Test
+    public void test_148(){
+        ListNode listNode5 = new ListNode(0,null);
+        ListNode listNode4 = new ListNode(4,listNode5);
+        ListNode listNode3 = new ListNode(3,listNode4);
+        ListNode listNode2 = new ListNode(5,listNode3);
+        ListNode listNode1 = new ListNode(-1,listNode2);
+        mergeSortList(listNode1);
+    }
+    public ListNode sortList(ListNode head) {
+        ListNode pre = new ListNode(0,head);
+        qucikSortList(pre,null);
+        return pre.next;
+    }
+
+    private void qucikSortList(ListNode pre, ListNode end) {
+        if(pre ==end || pre.next == end || pre.next.next == end ) return;
+        ListNode now = pre.next;
+        ListNode iter = now.next;
+        ListNode last = now;
+        while(iter != end){
+            if(iter.val < now.val){
+                last.next = iter.next;
+                iter.next = pre.next;
+                pre.next = iter;
+
+                iter = last.next;
+            }else {
+                last = last.next;
+                iter = iter.next;
+            }
+
+        }
+        qucikSortList(pre,now);
+        qucikSortList(now,end);
+    }
+
+    public ListNode mergeSortList(ListNode head) {
+        ListNode pre = head;
+        int N = 0;
+        while(pre != null){
+            N++;
+            pre = pre.next;
+        }
+        pre = new ListNode(0,head);
+        for (int sz = 1; sz < N ; sz += sz) {
+            ListNode preTemp = pre;
+            for (int i = 0; i < N - sz; i += sz+sz) {
+                merge(preTemp,sz,i+sz+sz>N? N-i: sz+sz);
+                for (int j = 0; j < sz + sz; j++) {
+                    if(preTemp.next == null) break;
+                    preTemp = preTemp.next;
+                }
+            }
+        }
+        return pre.next;
+    }
+
+    private static void merge(ListNode a, int mid, int right){
+        ListNode one = a.next;
+        ListNode two = a.next;
+        ListNode pre = a;
+        int temp = mid;
+        while(temp > 0) {
+            two = two.next;
+            temp--;
+        }
+        int oneCount = 0;
+        int twoCount = 0;
+        for (int i = 0; i < right; i++) {
+            if(oneCount == mid){
+                pre.next = two;
+                two = two.next;
+                twoCount++;
+            } else if (twoCount == right - mid) {
+                pre.next = one;
+                one = one.next;
+                oneCount++;
+            } else if(one.val <= two.val){
+                pre.next = one;
+                one = one.next;
+                oneCount++;
+            }else {
+                pre.next = two;
+                two = two.next;
+                twoCount++;
+            }
+            pre = pre.next;
+        }
+        pre.next = two;
+        System.out.println("  ");
+    }
+
+
+    /**
+     * 23: 合并k个升序链表
+     * @param lists
+     * @return
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        for (int i = 0; i < lists.length; i++) {
+            while(lists[i] != null){
+                queue.add(lists[i].val);
+                lists[i] = lists[i].next;
+            }
+        }
+        if(queue.isEmpty()) return null;
+        ListNode ret = new ListNode(queue.poll());
+        ListNode temp = ret;
+        while(!queue.isEmpty()){
+            temp.next = new ListNode(queue.poll());
+            temp = temp.next;
+        }
+        return ret;
+    }
+
+
+    /**
+     * 146: LRU缓存
+     */
+    class LRUCache {
+
+        int capacity;
+        LinkedHashMap<Integer,Integer> map = new LinkedHashMap<>();
+        public LRUCache(int capacity) {
+            this.capacity = capacity;
+        }
+
+        public int get(int key) {
+            int val = map.getOrDefault(key,-1);
+            if(val != -1){
+                map.remove(key);
+                map.put(key,val);
+            }
+            return val;
+        }
+
+        public void put(int key, int value) {
+            if(map.containsKey(key)){
+                map.remove(key);
+                map.put(key,value);
+                return;
+            }
+            if(map.size()<capacity){
+                map.put(key,value);
+                return;
+            }
+            map.remove(map.entrySet().iterator().next().getKey());
+            map.put(key,value);
+
+        }
+    }
+
+
+    class LRUCache2 extends LinkedHashMap<Integer, Integer>{
+        private int capacity;
+
+        public LRUCache2(int capacity) {
+            super(capacity, 0.75F, true);
+            this.capacity = capacity;
+        }
+
+        public int get(int key) {
+            return super.getOrDefault(key, -1);
+        }
+
+        public void put(int key, int value) {
+            super.put(key, value);
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+            return size() > capacity;
+        }
     }
 
 
