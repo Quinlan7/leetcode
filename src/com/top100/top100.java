@@ -996,6 +996,208 @@ public class top100 {
     }
 
 
+     public class TreeNode {
+         int val;
+         TreeNode left;
+         TreeNode right;
+         TreeNode() {}
+         TreeNode(int val) { this.val = val; }
+         TreeNode(int val, TreeNode left, TreeNode right) {
+             this.val = val;
+             this.left = left;
+             this.right = right;
+         }
+     }
+
+
+    /**
+     * 543: 二叉树的直径
+     * @param root
+     * @return
+     */
+    int ret_543 = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        if(root == null) return 0;
+        getNodeDiameter(root);
+        return ret_543;
+    }
+
+    private int getNodeDiameter(TreeNode root) {
+        if(root == null) return 0;
+        int L = getNodeDiameter(root.left);
+        int R = getNodeDiameter(root.right);
+        ret_543 = Math.max(ret_543,L+R);
+        return Math.max(L,R)+1;
+    }
+
+
+    /**
+     * 230: 二叉搜索树中第k小的元素
+     * @param root
+     * @param k
+     * @return
+     */
+    int ret_230 = -1;
+    int count_230;
+    public int kthSmallest(TreeNode root, int k) {
+        mediumOrderTraversal(root,k);
+        return ret_230;
+    }
+
+    private void mediumOrderTraversal(TreeNode root, int k) {
+        if(root == null) return ;
+        mediumOrderTraversal(root.left,k);
+        if(count_230 == k) {
+            return;
+        }
+        count_230++;
+        if(count_230 == k) {
+            ret_230 = root.val;
+            return;
+        }
+        mediumOrderTraversal(root.right,k);
+    }
+
+    /**
+     * 114: 二叉树展开为链表
+     * @param root
+     */
+    @Test
+    public void test_114(){
+        TreeNode treeNode6 = new TreeNode(6);
+        TreeNode treeNode5 = new TreeNode(5,null,treeNode6);
+        TreeNode treeNode4 = new TreeNode(4);
+        TreeNode treeNode3 = new TreeNode(3);
+        TreeNode treeNode2 = new TreeNode(2,treeNode3,treeNode4);
+        TreeNode treeNode1 = new TreeNode(1,treeNode2,treeNode5);
+        TreeNode treeNode = new TreeNode();
+        flatten(treeNode1);
+    }
+    public void flatten(TreeNode root) {
+        if(root.left == null){
+            if(root.right == null) return;
+            flatten(root.right);
+            return;
+        }
+        TreeNode left = root.left;
+        while(left.right != null){
+            left = left.right;
+        }
+        left.right = root.right;
+        root.right = root.left;
+        root.left = null;
+        flatten(root.right);
+    }
+
+
+    /**
+     * 105: 从前序与中序遍历序列构造二叉树
+     * @param preorder
+     * @param inorder
+     * @return
+     */
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if(preorder.length == 0) return null;
+        if(preorder.length == 1) return new TreeNode(preorder[0]);
+        int i = 0;
+        for(; i < preorder.length ; ){
+            if(inorder[i] == preorder[0]) break;
+            i++;
+        }
+        TreeNode root = new TreeNode(inorder[i]);
+        root.left = buildTree( Arrays.copyOfRange(preorder,1,i+1) , Arrays.copyOfRange(inorder,0,i));
+        root.right = buildTree( Arrays.copyOfRange(preorder, i+1 , preorder.length) , Arrays.copyOfRange(inorder, i + 1, inorder.length));
+        return root;
+    }
+
+
+    /**
+     * 437: 路径总和 III
+     * @param root
+     * @param targetSum
+     * @return
+     */
+    public int pathSum(TreeNode root, int targetSum) {
+        if(root == null) return 0;
+        int count = 0;
+        count += pathSumRoot(root,targetSum,0L);
+        count += pathSum(root.left,targetSum);
+        count += pathSum(root.right,targetSum);
+        return count;
+    }
+
+    private int pathSumRoot(TreeNode root,int targetSum,long sum){
+        if(root == null) return 0;
+        int count = 0;
+        sum += root.val;
+        count += pathSumRoot(root.left,targetSum,sum);
+        count += pathSumRoot(root.right,targetSum,sum);
+        if(sum == targetSum) count++;
+        return count;
+    }
+
+    public int pathSum2(TreeNode root, int targetSum) {
+        Map<Long, Integer> prefix = new HashMap<Long, Integer>();
+        prefix.put(0L, 1);
+        return dfs(root, prefix, 0, targetSum);
+    }
+
+    public int dfs(TreeNode root, Map<Long, Integer> prefix, long curr, int targetSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        int ret = 0;
+        curr += root.val;
+
+        ret = prefix.getOrDefault(curr - targetSum, 0);
+        prefix.put(curr, prefix.getOrDefault(curr, 0) + 1);
+        ret += dfs(root.left, prefix, curr, targetSum);
+        ret += dfs(root.right, prefix, curr, targetSum);
+        prefix.put(curr, prefix.getOrDefault(curr, 0) - 1);
+
+        return ret;
+    }
+
+
+    int max = -Integer.MAX_VALUE;
+
+    /**
+     * 124: 二叉树中的最大路径和
+     * @param root
+     * @return
+     */
+    @Test
+    public void test_124(){
+//        TreeNode treeNode6 = new TreeNode(6);
+//        TreeNode treeNode5 = new TreeNode(5,null,treeNode6);
+//        TreeNode treeNode4 = new TreeNode(4);
+        TreeNode treeNode3 = new TreeNode(3);
+        TreeNode treeNode2 = new TreeNode(2);
+        TreeNode treeNode1 = new TreeNode(1,treeNode2,treeNode3);
+        TreeNode treeNode = new TreeNode();
+        maxPathSum(treeNode1);
+    }
+    public int maxPathSum(TreeNode root) {
+        sumsum(root);
+        return max;
+    }
+
+    public int sumsum(TreeNode root) {
+        if(root == null) return 0;
+        int left = maxPathSum(root.left);
+        int right = maxPathSum(root.right);
+        int temp = left + right + root.val;
+        int bigOne = Math.max(left,right);
+        if(root.val < 0 && (left != 0 || right != 0) && temp < bigOne){
+            max = Math.max(max,bigOne);
+        }else {
+            max = Math.max(max,temp);
+        }
+        return Math.max(bigOne + root.val, 0);
+    }
+
+
 
 
 }
