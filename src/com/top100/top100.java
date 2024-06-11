@@ -75,7 +75,7 @@ public class top100 {
 
     /**
      * 283: 移动0
-     * @param nums
+     * @param
      */
     @Test
     public void test_283(){
@@ -697,8 +697,8 @@ public class top100 {
 
     /**
      * 25:K个一组翻转链表
-     * @param head
-     * @param k
+     * @param
+     * @param
      * @return
      */
     @Test
@@ -815,7 +815,7 @@ public class top100 {
 
     /**
      * 148:排序链表
-     * @param head
+     * @param
      * @return
      */
     @Test
@@ -1060,7 +1060,7 @@ public class top100 {
 
     /**
      * 114: 二叉树展开为链表
-     * @param root
+     * @param
      */
     @Test
     public void test_114(){
@@ -1164,7 +1164,7 @@ public class top100 {
 
     /**
      * 124: 二叉树中的最大路径和
-     * @param root
+     * @param
      * @return
      */
     @Test
@@ -1196,6 +1196,485 @@ public class top100 {
         }
         return Math.max(bigOne + root.val, 0);
     }
+
+
+    /**
+     * 994: 腐烂的橘子
+     * @param grid
+     * @return
+     */
+    public int orangesRotting(int[][] grid) {
+        int ret = BFS(grid);
+        for(int i = 0 ; i < grid.length ; i++){
+            for(int j = 0 ; j < grid[0].length ; j++){
+                if(grid[i][j] == 1) return -1;
+            }
+        }
+        return ret;
+    }
+
+    private int BFS(int[][] grid){
+        Queue<Map<String,Integer>> queue = new LinkedList<>();
+        for(int i = 0 ; i < grid.length ; i++){
+            for(int j = 0 ; j < grid[0].length ; j++){
+                if(grid[i][j] == 2){
+                    Map<String , Integer> map = new HashMap<>();
+                    map.put("x",i);
+                    map.put("y",j);
+                    map.put("min",0);
+                    queue.offer(map);
+                }
+            }
+        }
+        int minutes = 0;
+        while(!queue.isEmpty()){
+            Map<String,Integer> map = queue.poll();
+            int x = map.get("x");
+            int y = map.get("y");
+            minutes = map.get("min");
+            if( x+1 < grid.length && grid[x+1][y] == 1){
+                Map<String , Integer> temp = new HashMap<>();
+                grid[x+1][y] = 2;
+                temp.put("x",x+1);
+                temp.put("y",y);
+                temp.put("min",minutes+1);
+                queue.offer(temp);
+            }
+            if( x-1 >= 0 && grid[x-1][y] == 1){
+                Map<String , Integer> temp = new HashMap<>();
+                grid[x-1][y] = 2;
+                temp.put("x",x-1);
+                temp.put("y",y);
+                temp.put("min",minutes+1);
+                queue.offer(temp);
+            }
+            if( y+1 < grid[0].length && grid[x][y+1] == 1){
+                Map<String , Integer> temp = new HashMap<>();
+                grid[x][y+1] = 2;
+                temp.put("x",x);
+                temp.put("y",y+1);
+                temp.put("min",minutes+1);
+                queue.offer(temp);
+            }
+            if( y-1 >= 0 && grid[x][y-1] == 1){
+                Map<String , Integer> temp = new HashMap<>();
+                grid[x][y-1] = 2;
+                temp.put("x",x);
+                temp.put("y",y-1);
+                temp.put("min",minutes+1);
+                queue.offer(temp);
+            }
+        }
+        return minutes;
+    }
+
+
+    List<List<Integer>> graph;
+    int[] visited;
+    boolean notCircle = true;
+
+    /**
+     * 207: 课程表
+     * @param numCourses
+     * @param prerequisites
+     * @return
+     */
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        graph = new ArrayList<>();
+        visited = new int[numCourses];
+        for(int i = 0; i < numCourses ; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int i = 0; i < prerequisites.length ; i++){
+            graph.get(prerequisites[i][1]).add(prerequisites[i][0]);
+        }
+        for(int i = 0; i < numCourses && notCircle ; i++){
+            if(visited[i] == 0){
+                DFS(i);
+            }
+        }
+        return notCircle;
+    }
+
+    private void DFS(int i){
+        visited[i] = 1;
+        for( int node : graph.get(i) ){
+            if(visited[node] == 0){
+                DFS(node);
+                if(!notCircle) return;
+            }else if (visited[node] == 1){
+                notCircle = false;
+                return;
+            }
+        }
+        visited[i] = 2;
+    }
+
+
+    /**
+     * 208: 实现Trie
+     */
+    class Trie {
+
+        class Node{
+            char val;
+            List<Node> next;
+            boolean isEnd;
+            Node(char val){
+                this.val = val;
+                this.isEnd = false;
+            }
+        }
+
+        Node head;
+
+        public Trie() {
+            this.head = new Node('0');
+        }
+
+        public void insert(String word) {
+            char[] charWord = word.toCharArray();
+            Node now = head;
+            for(int i = 0; i < charWord.length; i++){
+                boolean falg = false;
+                //1 next 为 null
+                if(now.next == null){
+                    Node temp = new Node(charWord[i]);
+                    if(i == charWord.length - 1){
+                        temp.isEnd = true;
+                    }
+                    now = temp;
+                    List<Node> children = new LinkedList<>();
+                    children.add(temp);
+                    now.next = children;
+                }else{
+                    //2 next不为null
+                    for( Node once : now.next ){
+                        if(once.val == charWord[i]){
+                            if(i == charWord.length - 1){
+                                once.isEnd = true;
+                            }
+                            now = once;
+                            falg = true;
+                            break;
+                        }
+                    }
+                    //3 next 中没有当前 字符
+                    if(!falg){
+                        List<Node> nodes = now.next;
+                        Node temp = new Node(charWord[i]);
+                        if(i == charWord.length - 1){
+                            temp.isEnd = true;
+                        }
+                        nodes.add(temp);
+                        now = temp;
+                    }
+                }
+
+            }
+        }
+
+        public boolean search(String word) {
+            char[] charWord = word.toCharArray();
+            Node now = head;
+            for(int i = 0; i < charWord.length; i++){
+                boolean isContained = false;
+                if(now.next == null) return false;
+                for(Node temp : now.next){
+                    if(temp.val == charWord[i]){
+                        if(i == charWord.length - 1){
+                            if(!temp.isEnd){
+                                return false;
+                            }
+                        }
+                        isContained = true;
+                        now = temp;
+                        break;
+                    }
+                }
+                if(!isContained) return isContained;
+            }
+            return true;
+        }
+
+        public boolean startsWith(String prefix) {
+            char[] charWord = prefix.toCharArray();
+            Node now = head;
+            for(int i = 0; i < charWord.length; i++){
+                boolean isContained = false;
+                if(now.next == null) return false;
+                for(Node temp : now.next){
+                    if(temp.val == charWord[i]){
+                        isContained = true;
+                        now = temp;
+                        break;
+                    }
+                }
+                if(!isContained) return isContained;
+            }
+            return true;
+        }
+    }
+
+
+    int[] useTimes;
+    List<String> ret;
+    String[] options = {"(",")"};
+
+    /**
+     * 22: 括号生成
+     * @param n
+     * @return
+     */
+    public List<String> generateParenthesis(int n) {
+        useTimes = new int[2];
+        useTimes[0] = 1;
+        ret = new ArrayList<>();
+        backTrack(n,"(");
+        return ret;
+    }
+    private void backTrack(int n,String str){
+        if(useTimes[0] == n && useTimes[1] == n && isLegal(str)){
+            ret.add(new String(str));
+            return;
+        }
+
+        for(int i = 0 ; i < 2 ; i++){
+            if(useTimes[i] == n) continue;
+            str = str + options[i];
+            useTimes[i] += 1;
+            backTrack(n,str);
+            useTimes[i] -= 1;
+            str = str.substring(0,str.length()-1);
+        }
+    }
+
+    private boolean isLegal(String str){
+        Stack<String> stack = new Stack<>();
+        char[] chars = str.toCharArray();
+        for(int i = 0; i < chars.length; i++){
+            if(stack.isEmpty()){
+                stack.push(chars[i]+"");
+            }else if(chars[i] == ')' && stack.peek().equals("(") ){
+                stack.pop();
+            }else{
+                stack.push(chars[i]+"");
+            }
+        }
+        return stack.isEmpty();
+    }
+
+
+    boolean flag = false;
+
+    /**
+     * 79: 单词搜索
+     * @param board
+     * @param word
+     * @return
+     */
+    public boolean exist(char[][] board, String word) {
+        char[] chars = word.toCharArray();
+
+        for(int i = 0; i < board.length ; i++){
+            for(int j = 0 ; j < board[0].length ; j++){
+                if(board[i][j] == chars[0]){
+                    boolean isVisited[][] = new boolean[board.length][board[0].length];
+                    isVisited[i][j] = true;
+                    backTrack(board,isVisited,chars,1,i,j);
+                    if(flag) return flag;
+                }
+            }
+        }
+        return flag;
+    }
+
+    private void backTrack(char[][] board,boolean[][] isVisited,char[] word,int position,int x,int y){
+        if(position == word.length){
+            flag = true;
+            return;
+        }
+        if(x+1 < board.length && board[x+1][y] == word[position] && !isVisited[x+1][y]){
+            isVisited[x+1][y] = true;
+            backTrack(board,isVisited,word,position+1,x+1,y);
+            isVisited[x+1][y] = false;
+            if(flag) return;
+        }
+        if(x-1 >= 0 && board[x-1][y] == word[position] && !isVisited[x-1][y]){
+            isVisited[x-1][y] = true;
+            backTrack(board,isVisited,word,position+1,x-1,y);
+            isVisited[x-1][y] = false;
+            if(flag) return;
+        }
+        if(y+1 < board[0].length && board[x][y+1] == word[position] && !isVisited[x][y+1]){
+            isVisited[x][y+1] = true;
+            backTrack(board,isVisited,word,position+1,x,y+1);
+            isVisited[x][y+1] = false;
+            if(flag) return;
+        }
+        if(y-1 >= 0 && board[x][y-1] == word[position] && !isVisited[x][y-1]){
+            isVisited[x][y-1] = true;
+            backTrack(board,isVisited,word,position+1,x,y-1);
+            isVisited[x][y-1] = false;
+            if(flag) return;
+        }
+    }
+
+
+    /**
+     * 35: 搜索插入位置
+     * @param nums
+     * @param target
+     * @return
+     */
+    public int searchInsert(int[] nums, int target) {
+        int low = 0;
+        int high = nums.length - 1;
+        while(low <= high){
+            int mid = low + (high - low) /2 ;
+            if(nums[mid] == target) return mid;
+            if(nums[mid] > target) high = mid-1;
+            if(nums[mid] < target) low = mid+1;
+        }
+        return low;
+    }
+
+
+    /**
+     * 74: 搜索二维矩阵
+     * @param matrix
+     * @param target
+     * @return
+     */
+    public boolean searchMatrix1(int[][] matrix, int target) {
+        int low = 0;
+        int high = matrix.length * matrix[0].length - 1;
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+            int x = mid / matrix[0].length;
+            int y = mid % matrix[0].length;
+
+            if(matrix[x][y] == target) return true;
+            if(matrix[x][y] < target) low = mid + 1;
+            if(matrix[x][y] > target) high = mid - 1;
+        }
+        return false;
+    }
+
+
+    /**
+     * 34: 在排序数组中查找元素的第一个和最后一个位置
+     * @param nums
+     * @param target
+     * @return
+     */
+    public int[] searchRange(int[] nums, int target) {
+        int position = findPosition(nums , target);
+        if(position == -1) return new int[]{-1,-1};
+        int[] res = {position,position};
+        int i = 1;
+        while(position-i>=0 && nums[position - i] == target){
+            res[0] = position - i;
+            i++;
+        }
+        i = 1;
+        while(position+i < nums.length && nums[position + i] == target){
+            res[1] = position + i;
+            i++;
+        }
+        return res;
+    }
+
+
+    private int findPosition(int[] nums, int target){
+        int low = 0;
+        int high = nums.length - 1;
+        while(low <= high){
+            int mid = low + (high - low) /2 ;
+            if(nums[mid] == target) return mid;
+            if(nums[mid] > target) high = mid-1;
+            if(nums[mid] < target) low = mid+1;
+        }
+        return -1;
+    }
+
+
+    /**
+     * 33: 搜索旋转排序数组
+     * @param nums
+     * @param target
+     * @return
+     */
+    public int search(int[] nums, int target) {
+        int k = 0;
+        for(int i = 1; i < nums.length ; i++){
+            if(nums[i] < nums[i-1]){
+                k = i;
+                break;
+            }
+        }
+        int low = 0;
+        int high = nums.length - 1;
+        while(low <= high){
+            int rowMid = low + (high - low) /2 ;
+            int mid = (rowMid + k) % nums.length;
+            if(nums[mid] == target) return mid;
+            if(nums[mid] > target) high = rowMid-1;
+            if(nums[mid] < target) low = rowMid+1;
+        }
+        return -1;
+    }
+
+
+    /**
+     * 4: 寻找两个正序数组的中位数
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int totalLength = nums1.length + nums2.length;
+        int mid = 0;
+        double ret = 0;
+        if(totalLength % 2 == 0){
+            mid = totalLength / 2;
+            ret = findPosition(nums1,nums2,mid);
+            ret = (ret + findPosition(nums1,nums2,mid+1)) /2;
+        }else{
+            mid = totalLength / 2 + 1;
+            ret = findPosition(nums1,nums2,mid);
+        }
+        return ret;
+    }
+
+    private int findPosition(int[] nums1, int[] nums2,int coordinate){
+        int i = 0;
+        int j = 0;
+        int count = 1;
+        int ret;
+        while(true){
+            if(j == nums2.length){
+                ret = nums1[i];
+                i++;
+
+            }else if(i == nums1.length){
+                ret = nums2[j];
+                j++;
+
+            }
+            else if(nums1[i] < nums2[j] ){
+                ret = nums1[i];
+                i++;
+            }else {
+                ret = nums2[j];
+                j++;
+            }
+            if(count == coordinate) return ret;
+            count++;
+        }
+    }
+
+
 
 
 
