@@ -7,8 +7,6 @@ package com.top100;/**
 import org.junit.Test;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * @author zhf
@@ -1674,6 +1672,211 @@ public class top100 {
         }
     }
 
+    /**
+     * 155: 最小栈
+     */
+    class MinStack {
+        // 用来存储差值
+        private ArrayList<Long> stack;
+        // 当前的最小值
+        private long minVal;
+
+        // 初始化构造器
+        public MinStack() {
+            stack = new ArrayList<>();
+            minVal = Long.MAX_VALUE;
+        }
+
+        // 压入元素
+        public void push(int val) {
+            if (stack.isEmpty()) {
+                stack.add(0L);
+                minVal = val;
+            } else {
+                long diff = val - minVal;
+                stack.add(diff);
+                if (diff < 0) {
+                    minVal = val;
+                }
+            }
+        }
+
+        // 弹出元素
+        public void pop() {
+            if (stack.isEmpty()) {
+                throw new IllegalStateException("Stack is empty");
+            }
+            long diff = stack.remove(stack.size() - 1);
+            if (diff < 0) {
+                minVal -= diff;
+            }
+        }
+
+        // 获取栈顶元素
+        public int top() {
+            if (stack.isEmpty()) {
+                throw new IllegalStateException("Stack is empty");
+            }
+            long diff = stack.get(stack.size() - 1);
+            if (diff < 0) {
+                return (int) minVal;
+            } else {
+                return (int) (minVal + diff);
+            }
+        }
+
+        // 获取最小值
+        public int getMin() {
+            if (stack.isEmpty()) {
+                throw new IllegalStateException("Stack is empty");
+            }
+            return (int) minVal;
+        }
+    }
+
+
+    /**
+     * 394: 字符串解码
+     * @param s
+     * @return
+     */
+    public String decodeString(String s) {
+        Stack<Character> stack = new Stack<>();
+        for(int i = 0 ; i < s.length() ; i++){
+            if(s.charAt(i) == ']'){
+                String repeatORA = new String();
+                while(stack.peek() != '['){
+                    repeatORA = stack.pop() + repeatORA;
+                }
+                stack.pop();
+                String num = new String();
+                while(!stack.isEmpty() && stack.peek() <= 57 && stack.peek() >= 48){
+                    num = stack.pop() + num;
+                }
+                int times = Integer.valueOf(num);
+                String repeat = new String();
+                while(times != 0){
+                    repeat = repeat + repeatORA;
+                    times--;
+                }
+                for(int j = 0 ; j < repeat.length() ; j++){
+                    stack.push(repeat.charAt(j));
+                }
+            }else stack.push(s.charAt(i));
+
+        }
+        String ret = new String();
+        while(!stack.isEmpty()){
+            ret = stack.pop() + ret;
+        }
+        return ret;
+    }
+
+
+    /**
+     * 739: 每日温度
+     * @param temperatures
+     * @return
+     */
+    public int[] dailyTemperatures(int[] temperatures) {
+        int[] ret = new int[temperatures.length];
+        Stack<Integer> stack = new Stack<>();
+        stack.push(0);
+        for(int i = 1; i < temperatures.length ; i++){
+            while(!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]){
+                int temp = stack.pop();
+                ret[temp] = i - temp;
+            }
+            stack.push(i);
+        }
+        return ret;
+    }
+
+    /**
+     * 84: 柱状图中最大的矩形
+     * @param heights
+     * @return
+     */
+    public int largestRectangleArea(int[] heights) {
+        int max = 0;
+        Stack<Integer> stack = new Stack<>();
+        stack.push(0);
+        int[] minsStep = new int[heights.length];
+        for(int i = 1 ; i < heights.length ; i++){
+            while(!stack.isEmpty() && heights[i] < heights[stack.peek()]){
+                int temp = stack.pop();
+                minsStep[temp] = i - temp;
+            }
+            stack.push(i);
+        }
+        Stack<Integer> stackRight = new Stack<>();
+        stackRight.push(heights.length - 1);
+        int[] minsStepRight = new int[heights.length];
+        for(int i = heights.length - 2 ; i >= 0 ; i--){
+            while(!stackRight.isEmpty() && heights[i] < heights[stackRight.peek()]){
+                int temp = stackRight.pop();
+                minsStepRight[temp] = temp - i;
+            }
+            stackRight.push(i);
+        }
+        for(int i = 0; i < heights.length ; i++){
+            int step = minsStep[i] == 0? heights.length-i : minsStep[i];
+            int stepRight = minsStepRight[i] == 0 ? i+1 : minsStepRight[i];
+            max = Math.max(max, heights[i]*(step+ stepRight-1));
+        }
+        return max;
+    }
+
+
+    /**
+     * 295: 数据流的中位数
+     */
+    class MedianFinder {
+
+        PriorityQueue<Integer> A;
+        PriorityQueue<Integer> B;
+
+        public MedianFinder() {
+            this.A = new PriorityQueue<>((a,b) -> (b-a));
+            this.B = new PriorityQueue<>((a,b) -> (a-b));
+        }
+
+        public void addNum(int num) {
+            if(A.size() == B.size()){
+                if(A.size() == 0){
+                    A.offer(num);
+                }else if(num >= B.peek()){
+                    B.offer(num);
+                }else if(num <= A.peek()){
+                    A.offer(num);
+                }else A.offer(num);
+            }else if (A.size() > B.size()){
+                if(num >= A.peek()){
+                    B.offer(num);
+                }else {
+                    A.offer(num);
+                    B.offer(A.poll());
+                }
+            }else{
+                if(num <= B.peek()){
+                    A.offer(num);
+                }else{
+                    B.offer(num);
+                    A.offer(B.poll());
+                }
+            }
+        }
+
+        public double findMedian() {
+            if(A.size() == B.size()){
+                return (A.peek() + B.peek()) / 2.0;
+            }else if(A.size() > B.size()){
+                return A.peek();
+            }else return B.peek();
+        }
+    }
+
+    
 
 
 
