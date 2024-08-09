@@ -1833,6 +1833,8 @@ public class top100 {
      */
     class MedianFinder {
 
+        ArrayList<String> list = new ArrayList<>();
+
         PriorityQueue<Integer> A;
         PriorityQueue<Integer> B;
 
@@ -1875,6 +1877,51 @@ public class top100 {
             }else return B.peek();
         }
     }
+
+
+    /**
+     * 152:乘积最大子数组
+     * @param nums
+     * @return
+     */
+    public int maxProduct(int[] nums) {
+        double[] dpMax = new double[nums.length];
+        double[] dpMin = new double[nums.length];
+        dpMax[0] = nums[0];
+        dpMin[0] = nums[0];
+        double max = nums[0];
+        for(int i = 1; i < nums.length ; i++){
+            dpMax[i] = Math.max(dpMax[i-1]*nums[i],Math.max(nums[i],dpMin[i-1]*nums[i]));
+            dpMin[i] = Math.min(dpMax[i-1]*nums[i],Math.min(nums[i],dpMin[i-1]*nums[i]));
+            max = Math.max(max,dpMax[i]);
+        }
+        return (int)max;
+    }
+
+    public int longestValidParentheses(String s) {
+        if(s.length() < 2) return 0;
+        int[] dp = new int[s.length()];
+        dp[0] = 0;
+        int max = 0;
+        for(int i = 1; i < s.length() ; i++){
+            if(s.charAt(i) == '('){
+                dp[i] = 0;
+                continue;
+            }
+            if(i - dp[i-1] - 1 >= 0 && s.charAt( i - dp[i-1] - 1  ) == '('){
+                dp[i] = dp[i-1] + 2;
+                int j=i;
+                while( j >= 0 && j - dp[j] >= 0 &&  dp[j - dp[j]] != 0){
+                    dp[i] += dp[j - dp[j]];
+                    j -= dp[j];
+                }
+            }else{ dp[i] = 0; }
+            max = Math.max(max,dp[i]);
+        }
+        return max;
+    }
+
+
 
     
 
