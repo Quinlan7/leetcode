@@ -1898,6 +1898,11 @@ public class top100 {
         return (int)max;
     }
 
+    /**
+     * 32:最长有效括号
+     * @param s
+     * @return
+     */
     public int longestValidParentheses(String s) {
         if(s.length() < 2) return 0;
         int[] dp = new int[s.length()];
@@ -1922,6 +1927,56 @@ public class top100 {
     }
 
 
+    /**
+     * 64:最小路径和
+     * @param grid
+     * @return
+     */
+    public int minPathSum(int[][] grid) {
+        int[][] dp = new int[grid.length][grid[0].length];
+        dp[0][0] = grid[0][0];
+        for(int i = 1 ; i < grid.length ; i++){
+            dp[i][0] = dp[i-1][0] + grid[i][0];
+        }
+        for(int j = 1 ; j < grid[0].length ; j++){
+            dp[0][j] = dp[0][j-1] + grid[0][j];
+        }
+        for(int i = 1 ; i < grid.length ; i++){
+            for(int j = 1 ; j < grid[0].length ; j++){
+                dp[i][j] = Math.min(dp[i-1][j] + grid[i][j] , dp[i][j-1] + grid[i][j] );
+            }
+        }
+        return dp[grid.length - 1][grid[0].length - 1];
+
+    }
+
+
+    /**
+     * 5:最长回文子串
+     * @param s
+     * @return
+     */
+    public String longestPalindrome(String s) {
+        if(s.length() < 1) return "";
+        int start = 0;
+        int end = 0;
+        int len = 1;
+        for(int i = 1 ; i < s.length() ; i++ ){
+            len = Math.max(expandAroundCenter(s,i-1,i+1) , expandAroundCenter(s,i-1,i)) ;
+            if(len > end - start){
+                start = i - len/2 ;
+                end = i + (len-1)/2 ;
+            }
+        }
+        return s.substring( start , end + 1 );
+    }
+    private int expandAroundCenter(String s, int left , int  right){
+        while(left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right) ){
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
 
     
 
