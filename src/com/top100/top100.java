@@ -1978,6 +1978,127 @@ public class top100 {
         return right - left - 1;
     }
 
+
+    /**
+     * 136:只出现一次的数字
+     * @param nums
+     * @return
+     */
+    public int singleNumber(int[] nums) {
+        int ret = 0;
+        for(int i = 0 ; i < nums.length ; i++ ){
+            ret ^= nums[i];
+        }
+        return ret;
+    }
+
+    /**
+     * 169:多数元素
+     * @param nums
+     * @return
+     */
+    public int majorityElement(int[] nums) {
+        int candidate = nums[0];
+        int count = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if(count == 0){
+                candidate = nums[i];
+                count++;
+            }else if( nums[i] == candidate ){
+                count++;
+            }else count--;
+        }
+        return candidate;
+    }
+
+
+    /**
+     * 75:颜色分类
+     * @param nums
+     */
+    public void sortColors(int[] nums) {
+        int left = 0;
+        int right = nums.length - 1;
+        for(int i = 0 ; i < right + 1 ; i++){
+            if(nums[i] == 0){
+                exchange(nums,i,left++);
+            }else if(nums[i] == 2){
+                exchange(nums,i,right--);
+                i--;
+            }
+        }
+    }
+
+    private void exchange(int[] nums,int a,int b){
+        int temp = nums[a];
+        nums[a] = nums[b];
+        nums[b] = temp;
+    }
+
+
+    /**
+     * 31:下一个排列
+     * @param nums
+     */
+    public void nextPermutation(int[] nums) {
+        if(nums.length == 1) return;
+        int max = nums[nums.length - 1];
+        if(nums[nums.length-2] < max){
+            exchange(nums,nums.length-1,nums.length-2);
+            return;
+        }
+        for(int i = nums.length - 3 ; i >= 0 ; i--){
+            int position = findBig(nums,i);
+            if(position == -1){
+                continue;
+            }
+            exchange(nums,position,i);
+            Arrays.sort(nums,i+1,nums.length);
+            return;
+        }
+        Arrays.sort(nums);
+    }
+
+
+    private int findBig(int[] nums,int start){
+        int big = Integer.MAX_VALUE;
+        int position = start;
+        for(int i = start + 1 ; i < nums.length ; i++){
+            if(nums[i] > nums[start] && nums[i] < big){
+                position = i;
+                big = nums[i];
+            }
+        }
+        if(position == start){
+            return -1;
+        }
+        return position;
+    }
+
+
+    /**
+     * 287:寻找重复数
+     * @param nums
+     * @return
+     */
+    public int findDuplicate(int[] nums) {
+        int ret = 0;
+        for(int i = 0 ; i < nums.length ; i++){
+            if(nums[Math.abs(nums[i])] < 0){
+                ret = Math.abs(nums[i]);
+                break;
+            }
+            nums[Math.abs(nums[i])] = -nums[Math.abs(nums[i])];
+        }
+        for(int i = 0; i> nums.length ; i++){
+            nums[i] = Math.abs(nums[i]);
+        }
+        return ret;
+    }
+
+
+
+    
     
 
 
