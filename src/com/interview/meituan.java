@@ -115,6 +115,12 @@ public class meituan {
 //    链接：https://www.nowcoder.com/questionTerminal/d7f4f96f29b14feb973e7ad8ca74a8b7?examPageSource=%E5%85%AC%E5%8F%B8%E7%9C%9F%E9%A2%98%E7%AD%94%E6%A1%88#jsEditorModuleBody
 //    来源：牛客网
 
+    /**
+     * 小美的区间删除
+     * 小美拿到了一个大小为n的数组，她希望删除一个区间后，使得剩余所有元素的乘积末尾至少有k个 0。小美想知道，一共有多少种不同的删除方案？
+     * @param args
+     * @throws IOException
+     */
 
     public static void main2  (String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -176,6 +182,110 @@ public class meituan {
         System.out.println(count);
 
     }
+
+
+    /**
+     * 小美的平衡矩阵：滑动窗口
+     * 小美拿到了一个 n∗n 的矩阵，其中每个元素是 0 或者 1。
+     * 小美认为一个矩形区域是完美的，当且仅当该区域内 0 的数量恰好等于 1 的数量。
+     * 现在，小美希望你回答有多少个 i∗i 的完美矩形区域。你需要回答 1≤i≤n 的所有答案。
+     * @param args
+     */
+    public static void main3(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int[][] nums = new int[n][n];
+        String[] temp = new String[n];
+        for (int i = 0; i < n; i++) {
+            temp[i] = in.next();
+            for (int j = 0; j < n; j++) {
+                nums[i][j] = temp[i].charAt(j) - 48;
+            }
+        }
+        int[] ret = new int[n];
+        for (int i = 1; i < n + 1; i++) {
+            if ((i * i) % 2 == 1) {
+                ret[i - 1] = 0;
+                System.out.println(ret[i - 1]);
+                continue;
+            }
+            int target = (i * i) / 2;
+            int sum = 0;
+
+            // 二维滑动窗口
+            for (int j = 0; j < n - i + 1; j++) {
+                // 初始化 sum
+                sum = 0;
+                for (int jr = j; jr < j + i; jr++) {
+                    for (int k = 0; k < i; k++) {
+                        sum += nums[jr][k];
+                    }
+                }
+                if (sum == target) {
+                    ret[i - 1]++;
+                }
+                for (int k = i; k < n; k++) {
+                    for (int m = j; m < j + i; m++) {
+                        sum -= nums[m][k - i];
+                        sum += nums[m][k];
+                    }
+                    if (sum == target) {
+                        ret[i - 1]++;
+                    }
+
+                }
+            }
+            System.out.println(ret[i - 1]);
+
+        }
+    }
+
+//    链接：https://www.nowcoder.com/questionTerminal/d3a6268bbbf743f6b7441eb7ab30633e?examPageSource=%E5%85%AC%E5%8F%B8%E7%9C%9F%E9%A2%98%E7%AD%94%E6%A1%88#jsEditorModuleBody
+//    来源：牛客网
+
+    /**
+     * 小美的平衡矩阵：前缀和
+     * @param args
+     */
+    public static void main4(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int[][] rectInt = new int[n][n];
+        String[] temp = new String[n];
+        for (int i = 0; i < n; i++) {
+            temp[i] = in.next();
+            for (int j = 0; j < n; j++) {
+                rectInt[i][j] = temp[i].charAt(j) - 48;
+            }
+        }
+        // 使用 二维 数组的前缀和  之所以 +1 是为了统一 操作, 避免判断边界
+        //如果 不用 n+1 而使用 n  则需要手动初始化 第一行和第一列
+        int[][] preSum = new int[n + 1][n + 1];
+        for (int i = 1; i <=n ; i++) {
+            for (int j = 1; j <=n ; j++) {
+                preSum[i][j]=preSum[i][j-1]+preSum[i-1][j]-preSum[i-1][j-1]+rectInt[i-1][j-1];
+            }
+        }
+        for (int k = 1; k <= n; k++) {  //控制矩形大小
+            if (k%2!=0){  // 奇数个元素 0 和 1 的数量不可能相等
+                System.out.println(0);
+                continue;
+            }
+            int res=0;
+            int target=(k*k)/2;
+            for (int i = k; i <=n ; i++) {
+                for (int j = k; j <=n; j++) {
+                    //计算每一个小正方形的和
+                    int sum=preSum[i][j]-preSum[i-k][j]-preSum[i][j-k]+preSum[i-k][j-k];
+                    if (sum==target){
+                        res++;
+                    }
+                }
+            }
+            System.out.println(res);
+        }
+    }
+
 
 
 
