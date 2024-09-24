@@ -2122,6 +2122,30 @@ public class top100 {
     }
 
 
+    /**
+     * 239: 滑动窗口的最大值
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        PriorityQueue<int[]> q = new PriorityQueue<>((a,b) -> (b[0] - a[0]));
+        for(int i = 0; i < k ; i++){
+            q.offer(new int[]{nums[i],i});
+        }
+        int[] ret = new int[nums.length - k + 1];
+        ret[0] = q.peek()[0];
+        for(int i = k ; i < nums.length ; i++){
+            q.offer(new int[]{nums[i],i});
+            while( !q.isEmpty() && q.peek()[1] < i - k + 1){
+                q.poll();
+            }
+            ret[i - k + 1] = q.peek()[0];
+        }
+        return ret;
+
+    }
+
 
     
     
